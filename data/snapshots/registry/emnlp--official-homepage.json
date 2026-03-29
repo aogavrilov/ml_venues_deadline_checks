@@ -1,0 +1,9 @@
+{
+  "venue": "emnlp",
+  "source": {
+    "key": "official-homepage",
+    "kind": "official",
+    "url": "https://2025.emnlp.org/",
+    "notes": "Year-specific official site for CFP and venue dates."
+  }
+}

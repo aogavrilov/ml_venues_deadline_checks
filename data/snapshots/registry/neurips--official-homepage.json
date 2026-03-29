@@ -1,0 +1,12 @@
+{
+  "venue": "neurips",
+  "source": {
+    "key": "official-homepage",
+    "kind": "official",
+    "url": "https://neurips.cc/",
+    "notes": "Primary canonical source for conference dates and calls.",
+    "selectors": {
+      "deadlineText": "deadline"
+    }
+  }
+}

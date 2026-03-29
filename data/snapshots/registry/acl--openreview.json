@@ -1,0 +1,9 @@
+{
+  "venue": "acl",
+  "source": {
+    "key": "openreview",
+    "kind": "community",
+    "url": "https://openreview.net/group?id=aclweb.org/ACL",
+    "notes": "Secondary source when ACL uses OpenReview."
+  }
+}

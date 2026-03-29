@@ -1,0 +1,9 @@
+{
+  "venue": "emnlp",
+  "source": {
+    "key": "openreview",
+    "kind": "community",
+    "url": "https://openreview.net/group?id=EMNLP",
+    "notes": "Secondary source for review process and submission schedule."
+  }
+}

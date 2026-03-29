@@ -1,0 +1,9 @@
+{
+  "venue": "icml",
+  "source": {
+    "key": "openreview",
+    "kind": "community",
+    "url": "https://openreview.net/group?id=ICML.cc",
+    "notes": "Secondary metadata source for deadlines and submission records."
+  }
+}

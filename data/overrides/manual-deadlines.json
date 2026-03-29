@@ -1,0 +1,75 @@
+{
+  "version": 1,
+  "entries": [
+    {
+      "venueSlug": "iclr",
+      "editionYear": 2026,
+      "editionLabel": "ICLR 2026",
+      "editionStatus": "cfp_announced",
+      "sourceKey": "official-dates",
+      "trackSlug": "main",
+      "parser": "conference-dates-v1",
+      "targetSection": "Paper Submissions",
+      "notes": "Submission milestones are inferred from the shared conference dates template instead of exact row-name overrides.",
+      "includeKinds": [
+        "abstract_submission",
+        "paper_submission",
+        "reviews_released",
+        "author_response",
+        "decision_notification"
+      ]
+    },
+    {
+      "venueSlug": "neurips",
+      "editionYear": 2026,
+      "editionLabel": "NeurIPS 2026",
+      "editionStatus": "cfp_announced",
+      "sourceKey": "official-dates",
+      "trackSlug": "main",
+      "parser": "conference-dates-v1",
+      "targetSection": "Main Conference Paper Submission",
+      "notes": "Main conference submission milestones are parsed directly from the official dates page.",
+      "includeKinds": [
+        "abstract_submission",
+        "paper_submission",
+        "decision_notification"
+      ]
+    },
+    {
+      "venueSlug": "icml",
+      "editionYear": 2026,
+      "editionLabel": "ICML 2026",
+      "editionStatus": "cfp_announced",
+      "sourceKey": "official-dates",
+      "trackSlug": "main",
+      "parser": "conference-dates-v1",
+      "targetSection": "Paper Submissions",
+      "notes": "Paper-submission milestones are parsed from the official dates page for the main conference track.",
+      "includeKinds": [
+        "abstract_submission",
+        "paper_submission",
+        "reviews_released",
+        "author_response",
+        "decision_notification"
+      ]
+    },
+    {
+      "venueSlug": "cvpr",
+      "editionYear": 2026,
+      "editionLabel": "CVPR 2026",
+      "editionStatus": "cfp_announced",
+      "sourceKey": "official-dates",
+      "trackSlug": "main",
+      "parser": "conference-dates-v1",
+      "targetSection": "Paper Submissions",
+      "notes": "Core paper-submission milestones are parsed from the official dates page for the main conference track.",
+      "includeKinds": [
+        "abstract_submission",
+        "paper_submission",
+        "supplementary_submission",
+        "reviews_released",
+        "decision_notification"
+      ]
+    }
+  ]
+}

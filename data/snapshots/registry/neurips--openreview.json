@@ -1,0 +1,9 @@
+{
+  "venue": "neurips",
+  "source": {
+    "key": "openreview",
+    "kind": "community",
+    "url": "https://openreview.net/group?id=NeurIPS.cc",
+    "notes": "Useful secondary source for submission timelines and venue metadata."
+  }
+}

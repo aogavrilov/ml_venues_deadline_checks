@@ -1,0 +1,9 @@
+{
+  "venue": "iclr",
+  "source": {
+    "key": "official-homepage",
+    "kind": "official",
+    "url": "https://iclr.cc/",
+    "notes": "Primary canonical source for conference dates."
+  }
+}

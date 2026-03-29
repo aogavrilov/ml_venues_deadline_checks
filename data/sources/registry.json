@@ -1,0 +1,209 @@
+{
+  "version": 1,
+  "venues": [
+    {
+      "slug": "neurips",
+      "name": "NeurIPS",
+      "series": "Conference on Neural Information Processing Systems",
+      "area": "ml",
+      "timezone": "America/Los_Angeles",
+      "tracks": [
+        {
+          "slug": "main",
+          "name": "Main Conference",
+          "area": "ml"
+        },
+        {
+          "slug": "datasets-benchmarks",
+          "name": "Datasets and Benchmarks",
+          "area": "ml"
+        }
+      ],
+      "sources": [
+        {
+          "key": "official-homepage",
+          "kind": "official",
+          "url": "https://neurips.cc/",
+          "notes": "Primary canonical source for conference dates and calls.",
+          "selectors": {
+            "deadlineText": "deadline"
+          }
+        },
+        {
+          "key": "official-dates",
+          "kind": "official",
+          "url": "https://neurips.cc/Conferences/2026/Dates",
+          "notes": "Structured official dates page for canonical submission milestones."
+        },
+        {
+          "key": "openreview",
+          "kind": "community",
+          "url": "https://openreview.net/group?id=NeurIPS.cc",
+          "notes": "Useful secondary source for submission timelines and venue metadata."
+        }
+      ]
+    },
+    {
+      "slug": "icml",
+      "name": "ICML",
+      "series": "International Conference on Machine Learning",
+      "area": "ml",
+      "timezone": "America/New_York",
+      "tracks": [
+        {
+          "slug": "main",
+          "name": "Main Conference",
+          "area": "ml"
+        }
+      ],
+      "sources": [
+        {
+          "key": "official-homepage",
+          "kind": "official",
+          "url": "https://icml.cc/",
+          "notes": "Primary canonical source for conference dates and tracks."
+        },
+        {
+          "key": "official-dates",
+          "kind": "official",
+          "url": "https://icml.cc/Conferences/2026/Dates",
+          "notes": "Structured official dates page for canonical paper-submission milestones."
+        },
+        {
+          "key": "openreview",
+          "kind": "community",
+          "url": "https://openreview.net/group?id=ICML.cc",
+          "notes": "Secondary metadata source for deadlines and submission records."
+        }
+      ]
+    },
+    {
+      "slug": "iclr",
+      "name": "ICLR",
+      "series": "International Conference on Learning Representations",
+      "area": "ml",
+      "timezone": "America/New_York",
+      "tracks": [
+        {
+          "slug": "main",
+          "name": "Main Conference",
+          "area": "ml"
+        }
+      ],
+      "sources": [
+        {
+          "key": "official-homepage",
+          "kind": "official",
+          "url": "https://iclr.cc/",
+          "notes": "Primary canonical source for conference dates."
+        },
+        {
+          "key": "official-dates",
+          "kind": "official",
+          "url": "https://iclr.cc/Conferences/2026/Dates",
+          "notes": "Structured official schedule page for the first end-to-end deadline parser."
+        },
+        {
+          "key": "openreview",
+          "kind": "community",
+          "url": "https://openreview.net/group?id=ICLR.cc",
+          "notes": "OpenReview submission and discussion mirror."
+        }
+      ]
+    },
+    {
+      "slug": "cvpr",
+      "name": "CVPR",
+      "series": "IEEE/CVF Conference on Computer Vision and Pattern Recognition",
+      "area": "cv",
+      "timezone": "America/Los_Angeles",
+      "tracks": [
+        {
+          "slug": "main",
+          "name": "Main Conference",
+          "area": "cv"
+        }
+      ],
+      "sources": [
+        {
+          "key": "official-homepage",
+          "kind": "official",
+          "url": "https://cvpr.thecvf.com/",
+          "notes": "Primary canonical source for the yearly event and CFP pages."
+        },
+        {
+          "key": "official-dates",
+          "kind": "official",
+          "url": "https://cvpr.thecvf.com/Conferences/2026/Dates",
+          "notes": "Structured official dates page for canonical paper-submission milestones."
+        }
+      ]
+    },
+    {
+      "slug": "acl",
+      "name": "ACL",
+      "series": "Annual Meeting of the Association for Computational Linguistics",
+      "area": "nlp",
+      "timezone": "America/New_York",
+      "tracks": [
+        {
+          "slug": "main",
+          "name": "Main Conference",
+          "area": "nlp"
+        },
+        {
+          "slug": "findings",
+          "name": "Findings",
+          "area": "nlp"
+        }
+      ],
+      "sources": [
+        {
+          "key": "official-homepage",
+          "kind": "official",
+          "url": "https://aclweb.org/",
+          "notes": "Primary source for conference and anthology links."
+        },
+        {
+          "key": "openreview",
+          "kind": "community",
+          "url": "https://openreview.net/group?id=aclweb.org/ACL",
+          "notes": "Secondary source when ACL uses OpenReview."
+        }
+      ]
+    },
+    {
+      "slug": "emnlp",
+      "name": "EMNLP",
+      "series": "Conference on Empirical Methods in Natural Language Processing",
+      "area": "nlp",
+      "timezone": "America/New_York",
+      "tracks": [
+        {
+          "slug": "main",
+          "name": "Main Conference",
+          "area": "nlp"
+        },
+        {
+          "slug": "findings",
+          "name": "Findings",
+          "area": "nlp"
+        }
+      ],
+      "sources": [
+        {
+          "key": "official-homepage",
+          "kind": "official",
+          "url": "https://2025.emnlp.org/",
+          "notes": "Year-specific official site for CFP and venue dates."
+        },
+        {
+          "key": "openreview",
+          "kind": "community",
+          "url": "https://openreview.net/group?id=EMNLP",
+          "notes": "Secondary source for review process and submission schedule."
+        }
+      ]
+    }
+  ]
+}

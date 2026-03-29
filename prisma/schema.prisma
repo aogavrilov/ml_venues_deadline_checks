@@ -1,0 +1,134 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum VenueArea {
+  ml
+  cv
+  nlp
+  robotics
+  general
+}
+
+enum SourceKind {
+  official
+  community
+  mirror
+}
+
+enum SnapshotStatus {
+  pending
+  succeeded
+  failed
+}
+
+model Venue {
+  id          String    @id @default(cuid())
+  slug        String    @unique
+  name        String
+  series      String
+  area        VenueArea
+  timezone    String
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  editions    Edition[]
+  tracks      Track[]
+  sources     Source[]
+  deadlines   Deadline[]
+}
+
+model Edition {
+  id             String      @id @default(cuid())
+  venueId        String
+  year           Int
+  label          String
+  status         String
+  eventStartDate DateTime?
+  eventEndDate   DateTime?
+  locationName   String?
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  venue          Venue       @relation(fields: [venueId], references: [id], onDelete: Cascade)
+  deadlines      Deadline[]
+
+  @@unique([venueId, year])
+  @@index([year])
+}
+
+model Track {
+  id        String    @id @default(cuid())
+  venueId    String
+  slug      String
+  name      String
+  area      VenueArea
+  isDefault Boolean   @default(false)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  venue     Venue     @relation(fields: [venueId], references: [id], onDelete: Cascade)
+  deadlines Deadline[]
+
+  @@unique([venueId, slug])
+}
+
+model Deadline {
+  id                String      @id @default(cuid())
+  venueId           String
+  editionId         String
+  trackId           String?
+  name              String
+  kind              String
+  dueAt             DateTime
+  timezone          String
+  isHard            Boolean     @default(true)
+  notes             String?
+  sourceSnapshotId  String?
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  venue             Venue       @relation(fields: [venueId], references: [id], onDelete: Cascade)
+  edition           Edition     @relation(fields: [editionId], references: [id], onDelete: Cascade)
+  track             Track?      @relation(fields: [trackId], references: [id], onDelete: SetNull)
+  sourceSnapshot    SourceSnapshot? @relation(fields: [sourceSnapshotId], references: [id], onDelete: SetNull)
+
+  @@index([venueId, dueAt])
+  @@index([editionId, dueAt])
+}
+
+model Source {
+  id            String           @id @default(cuid())
+  venueId       String
+  key           String
+  kind          SourceKind
+  url           String
+  notes         String
+  selectorsJson String?
+  isCanonical   Boolean          @default(false)
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  venue         Venue            @relation(fields: [venueId], references: [id], onDelete: Cascade)
+  snapshots     SourceSnapshot[]
+
+  @@unique([venueId, key])
+}
+
+model SourceSnapshot {
+  id            String         @id @default(cuid())
+  sourceId       String
+  fetchedAt     DateTime       @default(now())
+  status        SnapshotStatus
+  httpStatus    Int?
+  contentHash   String?
+  contentPath   String?
+  extractedJson String?
+  errorMessage  String?
+  createdAt     DateTime       @default(now())
+  source        Source         @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  deadlines     Deadline[]
+
+  @@index([sourceId, fetchedAt])
+}

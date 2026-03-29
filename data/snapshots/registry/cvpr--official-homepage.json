@@ -1,0 +1,9 @@
+{
+  "venue": "cvpr",
+  "source": {
+    "key": "official-homepage",
+    "kind": "official",
+    "url": "https://cvpr.thecvf.com/",
+    "notes": "Primary canonical source for the yearly event and CFP pages."
+  }
+}

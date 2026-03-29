@@ -1,0 +1,12 @@
+.next
+out
+node_modules
+dist
+coverage
+*.log
+.env
+.agents
+*.tsbuildinfo
+*.db
+*.db-journal
+!prisma/dev.db
