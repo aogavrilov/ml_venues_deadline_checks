@@ -1,0 +1,9 @@
+{
+  "venue": "kdd",
+  "source": {
+    "key": "official-cfp",
+    "kind": "official",
+    "url": "https://kdd2026.kdd.org/research-track-call-for-papers/",
+    "notes": "Official research-track call for papers page with published 2026 deadlines."
+  }
+}

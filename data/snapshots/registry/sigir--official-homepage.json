@@ -1,0 +1,9 @@
+{
+  "venue": "sigir",
+  "source": {
+    "key": "official-homepage",
+    "kind": "official",
+    "url": "https://sigir.org/",
+    "notes": "SIGIR organization homepage is tracked until the year-specific SIGIR 2026 site or CFP page is publicly stable."
+  }
+}

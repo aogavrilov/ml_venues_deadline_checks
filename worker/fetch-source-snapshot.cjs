@@ -1,8 +1,11 @@
 const { createHash, randomUUID } = require("node:crypto");
+const { readFileSync } = require("node:fs");
 const { mkdir, writeFile } = require("node:fs/promises");
 const path = require("node:path");
 const { DatabaseSync } = require("node:sqlite");
 const registry = require("../data/sources/registry.json");
+const overrides = require("../data/overrides/manual-deadlines.json");
+const { extractDeadlines } = require("./conference-dates-parser.cjs");
 
 const database = new DatabaseSync(path.join(process.cwd(), "prisma", "dev.db"));
 
@@ -37,8 +40,78 @@ function resolveTarget() {
   return { venue, source };
 }
 
+function selectParserConfig(venueSlug, sourceKey) {
+  return [...overrides.entries]
+    .filter((entry) => entry.venueSlug === venueSlug && entry.sourceKey === sourceKey)
+    .sort((left, right) => right.editionYear - left.editionYear)[0] ?? null;
+}
+
+function summarizeDeadlines(deadlines) {
+  return deadlines
+    .map((deadline) => ({
+      kind: deadline.kind,
+      name: deadline.name,
+      dueAt: deadline.dueAt,
+      isHard: deadline.isHard,
+      sourceLabel: deadline.sourceLabel ?? null,
+      section: deadline.section ?? null
+    }))
+    .sort((left, right) => left.kind.localeCompare(right.kind));
+}
+
+function buildMilestoneDiff(previousDeadlines, currentDeadlines) {
+  const previousByKind = new Map(previousDeadlines.map((deadline) => [deadline.kind, deadline]));
+  const currentByKind = new Map(currentDeadlines.map((deadline) => [deadline.kind, deadline]));
+  const kinds = [...new Set([...previousByKind.keys(), ...currentByKind.keys()])].sort();
+  const changes = [];
+
+  for (const kind of kinds) {
+    const previous = previousByKind.get(kind) ?? null;
+    const current = currentByKind.get(kind) ?? null;
+
+    if (!previous && current) {
+      changes.push({ kind, changeType: "added", current });
+      continue;
+    }
+
+    if (previous && !current) {
+      changes.push({ kind, changeType: "removed", previous });
+      continue;
+    }
+
+    const fieldChanges = [];
+
+    for (const field of ["name", "dueAt", "isHard", "sourceLabel", "section"]) {
+      if (previous[field] !== current[field]) {
+        fieldChanges.push({
+          field,
+          previous: previous[field] ?? null,
+          current: current[field] ?? null
+        });
+      }
+    }
+
+    if (fieldChanges.length > 0) {
+      changes.push({
+        kind,
+        changeType: "modified",
+        previous,
+        current,
+        fieldChanges
+      });
+    }
+  }
+
+  return {
+    status: changes.length > 0 ? "milestones_changed" : "milestones_unchanged",
+    changedKinds: changes.map((change) => change.kind),
+    changes
+  };
+}
+
 async function main() {
   const { venue, source } = resolveTarget();
+  const parserConfig = selectParserConfig(venue.slug, source.key);
   const selectSource = database.prepare(`
     SELECT "Source"."id"
     FROM "Source"
@@ -91,13 +164,93 @@ async function main() {
         previousSnapshotId: null,
         previousFetchedAt: null
       };
+  let parsing;
+
+  if (!parserConfig) {
+    parsing = {
+      status: "unavailable",
+      parser: null,
+      editionYear: null,
+      deadlineCount: null,
+      error: null,
+      diff: {
+        status: "not_applicable",
+        changedKinds: [],
+        changes: []
+      }
+    };
+  } else {
+    try {
+      const currentExtraction = extractDeadlines(body, parserConfig);
+      const currentDeadlines = summarizeDeadlines(currentExtraction.deadlines);
+      let diff = {
+        status: "first_structured_snapshot",
+        changedKinds: [],
+        changes: []
+      };
+
+      if (previousSnapshot?.contentPath) {
+        try {
+          const previousHtml = readFileSync(previousSnapshot.contentPath, "utf8");
+          const previousExtraction = extractDeadlines(previousHtml, parserConfig);
+          diff = buildMilestoneDiff(summarizeDeadlines(previousExtraction.deadlines), currentDeadlines);
+        } catch (previousError) {
+          diff = {
+            status: "previous_parse_failed",
+            changedKinds: [],
+            changes: [],
+            previousError: previousError.message
+          };
+        }
+      }
+
+      parsing = {
+        status: "parsed",
+        parser: parserConfig.parser,
+        editionYear: parserConfig.editionYear,
+        deadlineCount: currentDeadlines.length,
+        error: null,
+        deadlines: currentDeadlines,
+        diff
+      };
+    } catch (error) {
+      parsing = {
+        status: "failed",
+        parser: parserConfig.parser,
+        editionYear: parserConfig.editionYear,
+        deadlineCount: null,
+        error: error.message,
+        diff: {
+          status: "parse_failed",
+          changedKinds: [],
+          changes: []
+        }
+      };
+    }
+  }
   const metadata = JSON.stringify(
     {
-      fetchedUrl: source.url,
-      finalUrl: response.url,
-      contentType,
-      fetchedAt: fetchedAt.toISOString(),
-      change
+      schemaVersion: 2,
+      source: {
+        venueSlug: venue.slug,
+        sourceKey: source.key,
+        sourceUrl: source.url
+      },
+      fetch: {
+        fetchedUrl: source.url,
+        finalUrl: response.url,
+        contentType,
+        fetchedAt: fetchedAt.toISOString(),
+        httpStatus: response.status
+      },
+      change,
+      parsing,
+      ingest: {
+        status: "pending",
+        error: null,
+        importedDeadlineCount: null,
+        queue: []
+      }
     },
     null,
     2

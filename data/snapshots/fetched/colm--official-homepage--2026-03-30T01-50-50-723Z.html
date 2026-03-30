@@ -1,0 +1,397 @@
+ 
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  
+  <!-- Required meta tags -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/moment@2.24.0/min/moment.min.js"
+    integrity="sha256-4iQZ6BVL4qNKlQ27TExEhBN1HFPvAvAMbFavKKosSWQ=" crossorigin="anonymous"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/moment-timezone@0.5.28/builds/moment-timezone-with-data.min.js"
+    integrity="sha256-IWYg4uIC8/erItNXYvLtyYHioRi2zT1TFva8qaAU/ww=" crossorigin="anonymous"></script>
+
+
+  <!-- Library libs_ext -->
+  <script src="static/js/libs_ext/typeahead.bundle.js"></script>
+
+
+  <!--    Internal Libs -->
+  <script src="static/js/data/api.js"></script>
+
+  
+
+  <!-- External CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
+    integrity="sha256-YLGeXaapI0/5IgZopewRJcFXomhRMlYYjugPLSyNjTY=" crossorigin="anonymous">
+
+  <!-- External Fonts (no google for china) -->
+  <link href="static/css/Lato.css" rel="stylesheet" />
+  <link href="static/css/Exo.css" rel="stylesheet" />
+  <link href="static/css/Cuprum.css" rel="stylesheet" />
+  <link rel="stylesheet" href="static/css/main.css" />
+  <!--    <link rel="stylesheet" href="static/css/fa_regular.css"/>-->
+  <link rel="stylesheet" href="static/css/fa_solid.css" />
+  <link rel="stylesheet" href="static/css/lazy_load.css" />
+  <link rel="stylesheet" href="static/css/typeahead.css" />
+  <link rel="icon" href="/favicon.svg" />
+  <title>COLM 2026</title>
+  
+</head>
+
+<body>
+  <!-- NAV -->
+  
+  
+  <nav class="navbar sticky-top navbar-expand-lg navbar-light bg-light mr-auto" id="main-nav">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">
+        <img class="logo" src="static/images/logo.svg" height="auto"
+          width="180px" />
+      </a>
+      
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse text-right flex-grow-1" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+          
+          <li class="nav-item dropdown  ">
+            <a class="nav-link " href="index.html" 
+              >Home</a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown1">
+              
+            </div>
+          </li>
+          
+          <li class="nav-item dropdown  ">
+            <a class="nav-link " href="dates.html" 
+              >Dates</a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown2">
+              
+            </div>
+          </li>
+          
+          <li class="nav-item dropdown  ">
+            <a class="nav-link " href="faq.html" 
+              >FAQ</a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown3">
+              
+            </div>
+          </li>
+          
+          <li class="nav-item dropdown  ">
+            <a class="nav-link dropdown-toggle" href="#" 
+              id="navbarDropdown4" role="button" data-toggle="dropdown"
+              
+              >Calls</a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown4">
+              
+              <a class="dropdown-item" href="cfp.html">Call for Papers</a>
+              
+              <a class="dropdown-item" href="cfw.html">Call for Workshops</a>
+              
+            </div>
+          </li>
+          
+          <li class="nav-item dropdown  ">
+            <a class="nav-link dropdown-toggle" href="#" 
+              id="navbarDropdown5" role="button" data-toggle="dropdown"
+              
+              >Guides</a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown5">
+              
+              <a class="dropdown-item" href="CoC.html">Code of Conduct</a>
+              
+              <a class="dropdown-item" href="CoE.html">Code of Ethics</a>
+              
+              <a class="dropdown-item" href="ReviewGuide.html">Review Guidelines</a>
+              
+              <a class="dropdown-item" href="ac-guidelines.html">AC Guidelines</a>
+              
+              <a class="dropdown-item" href="submission-instructions.html">Submission Instructions</a>
+              
+              <a class="dropdown-item" href="AuthorGuide.html">Author Guide</a>
+              
+              <a class="dropdown-item" href="coi-policy.html">COI Policy</a>
+              
+            </div>
+          </li>
+          
+          <li class="nav-item dropdown  ">
+            <a class="nav-link dropdown-toggle" href="#" 
+              id="navbarDropdown6" role="button" data-toggle="dropdown"
+              
+              >Organization</a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown6">
+              
+              <a class="dropdown-item" href="committees.html">Organizing Committee</a>
+              
+              <a class="dropdown-item" href="board.html">Board</a>
+              
+            </div>
+          </li>
+          
+        </ul>
+      </div>
+    </div>
+  </nav>
+  
+
+  
+  <!-- User Overrides -->
+  
+<style>
+    /* Image is 1280×382 — lock hero to that ratio so the photo isn’t vertically cropped
+       to a thin strip (which reads as “squeezed”). 100% + auto preserves natural proportions. */
+    .back {
+        aspect-ratio: 1280 / 382;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-image: url("static/images/hero-golden-gate-skyline.jpg");
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: 100% auto;
+    }
+
+    /* Panorama is very short at narrow widths; give more height so scaled text fits inside the band */
+    @media (max-width: 576px) {
+        .back {
+            aspect-ratio: 4 / 3;
+            background-size: cover;
+        }
+    }
+
+    .back h1,
+    .back h2 {
+        font-family: "Lato", sans-serif;
+        font-weight: 900;
+        max-width: 100%;
+    }
+
+    .back h1 {
+        margin-bottom: 0;
+        font-size: clamp(1rem, 3.2vw + 0.55rem, 2.5rem);
+        line-height: 1.1;
+    }
+
+    .back h2 {
+        margin-top: clamp(0.65rem, 5vw, 4rem);
+        margin-bottom: 0;
+        font-size: clamp(0.78rem, 1.65vw + 0.45rem, 1.3rem);
+        line-height: 1.35;
+    }
+
+    /* Keep copy inside the photo; scale padding with viewport */
+    .back .row.header > [class*="col-"] {
+        box-sizing: border-box;
+        max-width: 100%;
+        overflow-wrap: break-word;
+        word-wrap: break-word;
+        padding: clamp(0.4rem, 3.5vw, 1.75rem) clamp(0.35rem, 2.5vw, 0.75rem) !important;
+    }
+
+    /* Home only: remove gap between hero and main column (global .content has 75px padding-top) */
+    .container.back+.container .content {
+        padding-top: 0.75rem;
+    }
+
+    .container.back+.container {
+        margin-top: 0;
+    }
+
+    /* First section divider: global section() uses my-3, which adds a large gap under the hero */
+    .container.back+.container .content>.border-top:first-of-type {
+        margin-top: 0;
+    }
+
+    .container.back+.container .content>.border-top:first-of-type+.row.p-4 {
+        padding-top: 0.75rem !important;
+    }
+</style>
+
+<div class="container back">
+    <div class="row header w-100 justify-content-center">
+        <div style="-webkit-text-stroke: 1px black" class="text-center text-white col-md-12 col-sm-12">
+            <h1>CONFERENCE ON LANGUAGE MODELING</h1>
+            <h2 class="mb-0" style="-webkit-text-stroke: 1px black">
+                Hilton Union Square<br />
+                San Francisco, USA <br />
+                October 6-9, 2026
+            </h2>
+        </div>
+    </div>
+</div>
+
+
+
+  <div class="container">
+    <!-- Tabs -->
+    <div class="tabs">
+       
+    </div>
+    <!-- Content -->
+    <div class="content">
+      
+
+
+<!-- <div class="alert alert-info" role="alert">
+    <h3>
+        <center>COLM 2026 will take place in San Francisco, between October 6-9, 2026. Here is the <a
+                href="https://docs.google.com/document/d/1Z9iYHEJ0VPso3HjdUiQF-A_3UGbkvKg8L9jC1hHGHg8/edit?tab=t.0#heading=h.6uq4ly9xgnv">call
+                for papers</a>. The abstract deadline is March 26, 2026. The full paper deadline is March 31, 2026.
+        </center>
+    </h3>
+</div> -->
+
+<!-- <div class="alert alert-info" role="alert">
+    <h3>
+        <center> <a href="https://colm.eventhosts.cc/">Register</a> | <a href="https://forms.gle/n953Dp2UYQzKtqQVA">Resume Upload</a> | <a href="https://form.jotform.com/KiddieCorp/colmkids">Childcare</a> | <a href="https://colmweb.org/hotels.html"> Hotels </a></center>
+    </h3>
+</div> -->
+
+<!-- <div class="alert alert-info" role="alert">
+    <h3>
+        <center>COLM 2026 is now accepting applications for:<br/></center>
+        <center><a href="">Financial Assistance</a><br/></center>
+        <center><a href="">Volunteer</a><br/></center>
+        <center><a href="">Childcare Financial Assistance</a><br/></center>
+        <center>All due by July 31!</center>
+    </h3>
+</div> -->
+
+<!-- <div class="border-top my-3"></div>
+<div class="row p-4" id="faq">
+  <div class="col-12 bd-content">
+    
+    <h2 class="text-center">COLM</h2>
+    
+  </div>
+</div> -->
+
+<div class="h5" style="line-height: 1.5; padding-bottom: 50px">
+    <p>The leap in general-purpose capabilities from language models is a landmark
+        in the development of Artificial Intelligence. The nature of this technology
+        has led to a different set of research questions than are the typical focus
+        of related venues. COLM is an academic venue focused on the study of
+        language modeling, broadly defined, with the goal of creating a community of
+        researchers with expertise in different disciplines, focused on
+        understanding, improving, and critiquing the development of LM technology.
+        If you are interested in this goal, see our
+        <a href="cfp.html">Call for Papers</a>.
+    </p>
+    <p>To receive announcements from COLM, please sign up to our <a
+            href="https://groups.google.com/g/colm-announcements">mailing list</a>, or follow COLM on <a
+            href="https://bsky.app/profile/colmweb.org">Bluesky</a> or <a href="https://x.com/COLM_conf">X</a>.</p>
+</div>
+
+<div class="border-top my-3"></div>
+<div class="row p-4" id="faq">
+  <div class="col-12 bd-content">
+    
+    <h2 class="text-center">Venue</h2>
+    
+  </div>
+</div>
+
+<div class="h5" style="line-height: 1.5; padding-bottom: 50px">
+    COLM 2026 will take place at the Hilton Union Square in San Francisco, USA from
+    October 6-9, 2026. The conference will be a three-day single-track event
+    with a mix of invited talks, oral paper presentations, and poster sessions.
+    The fourth day will be dedicated to workshops.
+</div>
+
+<div class="row justify-content-md-center">
+    <div class="col-md-6 col-sm-12">
+        <img width="100%"
+            src="https://lh3.googleusercontent.com/p/AF1QipNgKkq2HYV7hj0GFLRBn7wiLf2RjJJuavM-Rrvn=s1360-w1360-h1020-rw" />
+    </div>
+</div>
+
+<div class="border-top my-3"></div>
+<div class="row p-4" id="faq">
+  <div class="col-12 bd-content">
+    
+    <h2 class="text-center">Sponsorship</h2>
+    
+  </div>
+</div>
+
+<div class="h5" style="line-height: 1.5; padding-bottom: 50px">
+    If you are interested in sponsoring COLM, please reach out to the
+    <a href="mailto:chris.brown@aicons.org">COLM Organizational Chair</a>.
+</div>
+
+<div class="border-top my-3"></div>
+<div class="row p-4" id="faq">
+  <div class="col-12 bd-content">
+    
+    <h2 class="text-center">Past Years</h2>
+    
+  </div>
+</div>
+
+<div class="h5" style="line-height: 1.5; padding-bottom: 50px">
+    Browse static archives for
+    <a href="/2025/">2025</a> and
+    <a href="/2024/">2024</a>.
+</div>
+
+
+    </div>
+  </div>
+  
+  
+
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+
+    gtag("js", new Date());
+    gtag("config", "UA-");
+  </script>
+
+  <!-- Footer -->
+  <footer class="footer bg-light p-4">
+    <div class="container">
+      <p class="float-right"><a href="#">Back to Top</a></p>
+      <p class="text-center">© 2026 COLM Organization Committee</p>
+    </div>
+  </footer>
+
+  <!-- Code for hash tags -->
+  <script type="text/javascript">
+    $(document).ready(function () {
+      if (window.location.hash !== "") {
+        $(`a[href="${window.location.hash}"]`).tab("show");
+      }
+
+      $("a[data-toggle='tab']").on("shown.bs.tab", function (e) {
+        const hash = $(e.target).attr("href");
+        if (hash.substr(0, 1) === "#") {
+          const position = $(window).scrollTop();
+          window.location.replace(`#${hash.substr(1)}`);
+          $(window).scrollTop(position);
+        }
+      });
+    });
+  </script>
+  <!--    <script src="static/js/modules/lazyLoad.js"></script>-->
+  
+</body>
+
+</html>

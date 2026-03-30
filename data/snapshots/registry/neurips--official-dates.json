@@ -1,0 +1,9 @@
+{
+  "venue": "neurips",
+  "source": {
+    "key": "official-dates",
+    "kind": "official",
+    "url": "https://neurips.cc/Conferences/2026/Dates",
+    "notes": "Structured official dates page for canonical submission milestones."
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "venue": "kdd",
+  "source": {
+    "key": "official-homepage",
+    "kind": "official",
+    "url": "https://kdd2026.kdd.org/",
+    "notes": "Primary official landing page for ACM KDD 2026."
+  }
+}

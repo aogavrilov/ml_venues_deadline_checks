@@ -3,9 +3,56 @@ const { readFileSync } = require("node:fs");
 const path = require("node:path");
 const { DatabaseSync } = require("node:sqlite");
 const overrides = require("../data/overrides/manual-deadlines.json");
-const { extractCanonicalDeadlines } = require("./conference-dates-parser.cjs");
+const { extractDeadlines } = require("./conference-dates-parser.cjs");
 
 const database = new DatabaseSync(path.join(process.cwd(), "prisma", "dev.db"));
+
+function parseMetadata(raw) {
+  if (!raw) {
+    return {};
+  }
+
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return {};
+  }
+}
+
+function summarizeDeadlines(deadlines) {
+  return deadlines.map((deadline) => ({
+    kind: deadline.kind,
+    name: deadline.name,
+    dueAt: deadline.dueAt,
+    isHard: deadline.isHard,
+    sourceLabel: deadline.sourceLabel ?? null,
+    section: deadline.section ?? null
+  }));
+}
+
+function updateSnapshotMetadata(snapshotId, updater) {
+  const selectSnapshotMetadata = database.prepare(`
+    SELECT "extractedJson"
+    FROM "SourceSnapshot"
+    WHERE "id" = ?
+  `);
+  const updateSnapshotMetadataStatement = database.prepare(`
+    UPDATE "SourceSnapshot"
+    SET "extractedJson" = ?, "errorMessage" = ?
+    WHERE "id" = ?
+  `);
+  const snapshot = selectSnapshotMetadata.get(snapshotId);
+  const metadata = parseMetadata(snapshot?.extractedJson ?? null);
+  const nextMetadata = updater(metadata);
+
+  updateSnapshotMetadataStatement.run(
+    JSON.stringify(nextMetadata, null, 2),
+    nextMetadata.ingest?.error ?? nextMetadata.parsing?.error ?? null,
+    snapshotId
+  );
+
+  return nextMetadata;
+}
 
 function main() {
   const venueSlug = process.argv[2] ?? "iclr";
@@ -30,11 +77,20 @@ function main() {
     WHERE "Venue"."slug" = ? AND "Track"."slug" = ?
   `);
   const selectSnapshot = database.prepare(`
-    SELECT "SourceSnapshot"."id", "SourceSnapshot"."contentPath", "SourceSnapshot"."fetchedAt"
+    SELECT "SourceSnapshot"."id", "SourceSnapshot"."contentPath", "SourceSnapshot"."fetchedAt", "SourceSnapshot"."extractedJson"
     FROM "SourceSnapshot"
     INNER JOIN "Source" ON "Source"."id" = "SourceSnapshot"."sourceId"
     INNER JOIN "Venue" ON "Venue"."id" = "Source"."venueId"
     WHERE "Venue"."slug" = ? AND "Source"."key" = ? AND "SourceSnapshot"."status" = 'succeeded'
+    ORDER BY "SourceSnapshot"."fetchedAt" DESC
+    LIMIT 1
+  `);
+  const selectLatestSnapshot = database.prepare(`
+    SELECT "SourceSnapshot"."id", "SourceSnapshot"."status", "SourceSnapshot"."extractedJson"
+    FROM "SourceSnapshot"
+    INNER JOIN "Source" ON "Source"."id" = "SourceSnapshot"."sourceId"
+    INNER JOIN "Venue" ON "Venue"."id" = "Source"."venueId"
+    WHERE "Venue"."slug" = ? AND "Source"."key" = ?
     ORDER BY "SourceSnapshot"."fetchedAt" DESC
     LIMIT 1
   `);
@@ -63,6 +119,7 @@ function main() {
   const venue = selectVenue.get(config.venueSlug);
   const track = selectTrack.get(config.venueSlug, config.trackSlug);
   const snapshot = selectSnapshot.get(config.venueSlug, config.sourceKey);
+  const latestSnapshot = selectLatestSnapshot.get(config.venueSlug, config.sourceKey);
 
   if (!venue) {
     throw new Error(`Venue ${config.venueSlug} is missing from the database.`);
@@ -73,11 +130,61 @@ function main() {
   }
 
   if (!snapshot) {
+    if (latestSnapshot?.id) {
+      updateSnapshotMetadata(latestSnapshot.id, (metadata) => ({
+        ...metadata,
+        ingest: {
+          status: "failed",
+          error: `No successful snapshot found for ${config.venueSlug}/${config.sourceKey}. Run worker:fetch first.`,
+          importedDeadlineCount: 0,
+          queue: [
+            {
+              code: latestSnapshot.status === "failed" ? "fetch_failed" : "missing_successful_snapshot",
+              venueSlug: config.venueSlug,
+              sourceKey: config.sourceKey,
+              editionYear: config.editionYear
+            }
+          ]
+        }
+      }));
+    }
+
     throw new Error(`No successful snapshot found for ${config.venueSlug}/${config.sourceKey}. Run worker:fetch first.`);
   }
 
   const html = readFileSync(snapshot.contentPath, "utf8");
-  const extracted = extractCanonicalDeadlines(html, config);
+  let extracted;
+
+  try {
+    extracted = extractDeadlines(html, config);
+  } catch (error) {
+    updateSnapshotMetadata(snapshot.id, (metadata) => ({
+      ...metadata,
+      parsing: {
+        ...(metadata.parsing ?? {}),
+        status: "failed",
+        parser: config.parser,
+        editionYear: config.editionYear,
+        error: error.message
+      },
+      ingest: {
+        status: "failed",
+        error: error.message,
+        importedDeadlineCount: 0,
+        queue: [
+          {
+            code: "parser_failed",
+            venueSlug: config.venueSlug,
+            sourceKey: config.sourceKey,
+            editionYear: config.editionYear
+          }
+        ]
+      }
+    }));
+
+    throw error;
+  }
+
   const mappedDeadlines = extracted.deadlines;
   const existingEdition = selectEdition.get(venue.id, config.editionYear);
   const editionId = existingEdition?.id ?? randomUUID();
@@ -109,6 +216,25 @@ function main() {
   }
 
   database.exec("COMMIT");
+
+  updateSnapshotMetadata(snapshot.id, (metadata) => ({
+    ...metadata,
+    parsing: {
+      ...(metadata.parsing ?? {}),
+      status: "parsed",
+      parser: config.parser,
+      editionYear: config.editionYear,
+      deadlineCount: mappedDeadlines.length,
+      error: null,
+      deadlines: summarizeDeadlines(mappedDeadlines)
+    },
+    ingest: {
+      status: "succeeded",
+      error: null,
+      importedDeadlineCount: mappedDeadlines.length,
+      queue: []
+    }
+  }));
 
   console.log(
     JSON.stringify(

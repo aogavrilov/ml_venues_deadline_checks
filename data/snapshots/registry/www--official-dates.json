@@ -1,0 +1,9 @@
+{
+  "venue": "www",
+  "source": {
+    "key": "official-dates",
+    "kind": "official",
+    "url": "https://www2026.thewebconf.org/important-dates.html",
+    "notes": "Official important-dates page for research track submission milestones."
+  }
+}

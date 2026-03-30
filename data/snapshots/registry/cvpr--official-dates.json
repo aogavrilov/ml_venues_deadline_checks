@@ -1,0 +1,9 @@
+{
+  "venue": "cvpr",
+  "source": {
+    "key": "official-dates",
+    "kind": "official",
+    "url": "https://cvpr.thecvf.com/Conferences/2026/Dates",
+    "notes": "Structured official dates page for canonical paper-submission milestones."
+  }
+}

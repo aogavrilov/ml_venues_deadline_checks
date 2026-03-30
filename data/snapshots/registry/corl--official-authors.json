@@ -1,0 +1,9 @@
+{
+  "venue": "corl",
+  "source": {
+    "key": "official-authors",
+    "kind": "official",
+    "url": "https://2026.corl.org/contributions/instruction-for-authors",
+    "notes": "Official author instructions page with the currently published CoRL 2026 key-date notes; tracked for monitoring until a cleaner dates page is available."
+  }
+}

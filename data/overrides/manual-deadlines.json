@@ -2,6 +2,21 @@
   "version": 1,
   "entries": [
     {
+      "venueSlug": "acl",
+      "editionYear": 2026,
+      "editionLabel": "ACL 2026",
+      "editionStatus": "cfp_announced",
+      "sourceKey": "official-homepage",
+      "trackSlug": "main",
+      "parser": "acl-important-dates-v1",
+      "notes": "Important Dates on the official ACL 2026 homepage define the canonical ARR submission and acceptance milestones.",
+      "includeKinds": [
+        "paper_submission",
+        "reviews_released",
+        "decision_notification"
+      ]
+    },
+    {
       "venueSlug": "iclr",
       "editionYear": 2026,
       "editionLabel": "ICLR 2026",
@@ -68,6 +83,136 @@
         "paper_submission",
         "supplementary_submission",
         "reviews_released",
+        "decision_notification"
+      ]
+    },
+    {
+      "venueSlug": "emnlp",
+      "editionYear": 2025,
+      "editionLabel": "EMNLP 2025",
+      "editionStatus": "cfp_announced",
+      "sourceKey": "official-homepage",
+      "trackSlug": "main",
+      "parser": "emnlp-important-dates-v1",
+      "notes": "Important Dates on the official EMNLP 2025 homepage define the canonical ARR submission, author-response, and acceptance milestones.",
+      "includeKinds": [
+        "paper_submission",
+        "author_response",
+        "decision_notification"
+      ]
+    },
+    {
+      "venueSlug": "aistats",
+      "editionYear": 2026,
+      "editionLabel": "AISTATS 2026",
+      "editionStatus": "cfp_announced",
+      "sourceKey": "official-dates",
+      "trackSlug": "main",
+      "parser": "aistats-important-dates-v1",
+      "notes": "AISTATS 2026 publishes a dedicated official Dates page with abstract, paper, and decision milestones.",
+      "includeKinds": [
+        "abstract_submission",
+        "paper_submission",
+        "decision_notification"
+      ]
+    },
+    {
+      "venueSlug": "kdd",
+      "editionYear": 2026,
+      "editionLabel": "KDD 2026",
+      "editionStatus": "cfp_announced",
+      "sourceKey": "official-cfp",
+      "trackSlug": "main",
+      "parser": "kdd-important-dates-v1",
+      "notes": "The official KDD 2026 research-track CFP publishes abstract, paper, rebuttal, and notification dates.",
+      "includeKinds": [
+        "abstract_submission",
+        "paper_submission",
+        "author_response",
+        "decision_notification"
+      ]
+    },
+    {
+      "venueSlug": "www",
+      "editionYear": 2026,
+      "editionLabel": "WWW 2026",
+      "editionStatus": "cfp_announced",
+      "sourceKey": "official-dates",
+      "trackSlug": "main",
+      "parser": "webconf-important-dates-v1",
+      "targetSection": "Research & Industry tracks papers",
+      "notes": "The Web Conference 2026 publishes a dedicated Important Dates page for the research and industry tracks.",
+      "includeKinds": [
+        "abstract_submission",
+        "paper_submission",
+        "author_response",
+        "decision_notification"
+      ]
+    },
+    {
+      "venueSlug": "naacl",
+      "editionYear": 2025,
+      "editionLabel": "NAACL 2025",
+      "editionStatus": "cfp_announced",
+      "sourceKey": "official-cfp",
+      "trackSlug": "main",
+      "parser": "naacl-important-dates-v1",
+      "notes": "The latest stable NAACL official call page on March 30, 2026 exposes the ARR-based main-conference timeline for NAACL 2025.",
+      "includeKinds": [
+        "paper_submission",
+        "reviews_released",
+        "author_response",
+        "decision_notification"
+      ]
+    },
+    {
+      "venueSlug": "colm",
+      "editionYear": 2026,
+      "editionLabel": "COLM 2026",
+      "editionStatus": "cfp_announced",
+      "sourceKey": "official-dates",
+      "trackSlug": "main",
+      "parser": "colm-important-dates-v1",
+      "notes": "COLM 2026 publishes a dedicated official dates page for the main track timeline.",
+      "includeKinds": [
+        "abstract_submission",
+        "paper_submission",
+        "author_response",
+        "decision_notification"
+      ]
+    },
+    {
+      "venueSlug": "eccv",
+      "editionYear": 2026,
+      "editionLabel": "ECCV 2026",
+      "editionStatus": "cfp_announced",
+      "sourceKey": "official-dates",
+      "trackSlug": "main",
+      "parser": "conference-dates-v1",
+      "targetSection": "Paper Submissions",
+      "notes": "ECCV 2026 uses the ECVA dates-page structure that matches the existing conference-dates parser with minor milestone aliases.",
+      "includeKinds": [
+        "paper_submission",
+        "supplementary_submission",
+        "reviews_released",
+        "author_response",
+        "decision_notification"
+      ]
+    },
+    {
+      "venueSlug": "iccv",
+      "editionYear": 2025,
+      "editionLabel": "ICCV 2025",
+      "editionStatus": "cfp_announced",
+      "sourceKey": "official-dates",
+      "trackSlug": "main",
+      "parser": "conference-dates-v1",
+      "targetSection": "Main Conference Paper Submission",
+      "notes": "The latest published ICCV dates page on March 30, 2026 is ICCV 2025, which matches the shared CVF conference-dates parser with milestone alias support.",
+      "includeKinds": [
+        "paper_submission",
+        "reviews_released",
+        "author_response",
         "decision_notification"
       ]
     }

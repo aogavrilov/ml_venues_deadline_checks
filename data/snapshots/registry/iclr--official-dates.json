@@ -1,0 +1,9 @@
+{
+  "venue": "iclr",
+  "source": {
+    "key": "official-dates",
+    "kind": "official",
+    "url": "https://iclr.cc/Conferences/2026/Dates",
+    "notes": "Structured official schedule page for the first end-to-end deadline parser."
+  }
+}

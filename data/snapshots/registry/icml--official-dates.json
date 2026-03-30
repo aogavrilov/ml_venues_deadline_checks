@@ -1,0 +1,9 @@
+{
+  "venue": "icml",
+  "source": {
+    "key": "official-dates",
+    "kind": "official",
+    "url": "https://icml.cc/Conferences/2026/Dates",
+    "notes": "Structured official dates page for canonical paper-submission milestones."
+  }
+}

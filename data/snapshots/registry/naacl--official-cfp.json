@@ -1,0 +1,9 @@
+{
+  "venue": "naacl",
+  "source": {
+    "key": "official-cfp",
+    "kind": "official",
+    "url": "https://2025.naacl.org/calls/papers/",
+    "notes": "Official main-conference papers call page with the latest stable NAACL ARR commitment timeline."
+  }
+}

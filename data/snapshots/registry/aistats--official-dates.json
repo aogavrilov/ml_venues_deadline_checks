@@ -1,0 +1,9 @@
+{
+  "venue": "aistats",
+  "source": {
+    "key": "official-dates",
+    "kind": "official",
+    "url": "https://virtual.aistats.org/Conferences/2026/Dates",
+    "notes": "Structured official dates page for AISTATS 2026 submission milestones."
+  }
+}

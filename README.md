@@ -54,9 +54,9 @@ Push to `main` and GitHub Actions will publish the static export from `out/`.
 - The deployed site uses the committed `prisma/dev.db`, so Pages builds from a
   deterministic dataset without external infrastructure.
 
-## Initial registry scope
+## Registry scope
 
-The curated starter set covers:
+The current tracked venue set covers:
 
 - NeurIPS
 - ICML
@@ -64,14 +64,33 @@ The curated starter set covers:
 - CVPR
 - ACL
 - EMNLP
+- AISTATS
+- CoRL
+- KDD
+- NAACL
+- COLM
+- ECCV
+- ICCV
+- SIGIR
+- WWW
 
-This is intentionally enough to support the first ingestion path and public list view, without overfitting the schema to one venue family.
+This is intentionally broad enough to cover the first two Phase 1 expansion waves
+without overfitting the schema to one venue family.
 
 ## Parser coverage
 
-The current production parser targets the shared conference `.../Dates` page
-template used by ICLR, NeurIPS, ICML, and CVPR. It normalizes the canonical
-milestones the page exposes for each venue, including:
+The current production parser set covers five source shapes:
+
+- the shared conference `.../Dates` page template used by ICLR, NeurIPS, ICML, and CVPR
+- homepage `Important Dates` tables for ACL 2026 and EMNLP 2025
+- AISTATS 2026's official dates page
+- KDD 2026's research-track CFP dates block
+- The Web Conference 2026 research-track important-dates page
+- NAACL 2025's ARR-based main-conference call page
+- COLM 2026's key-dates page
+- ECCV 2026 and ICCV 2025 through the shared ECVA/CVF dates-table structure plus milestone aliases
+
+Across those sources it normalizes the canonical milestones each page exposes, including:
 
 - Abstract submission deadline
 - Paper submission deadline
@@ -85,24 +104,34 @@ track, and section, while the parser owns the label matching for common
 milestone names. That keeps venue config declarative and reduces exact-string
 overrides.
 
-## Change detection
+## Source health contract
 
-`pnpm worker:fetch -- <venue> <source>` now compares the freshly fetched
-snapshot hash against the previous snapshot for that source and records a simple
-change signal in `SourceSnapshot.extractedJson`:
+`SourceSnapshot.extractedJson` is now the public health envelope consumed by the
+app. New fetch and ingest runs write a versioned structure with:
 
-- `first_snapshot` when no prior fetch exists
-- `unchanged` when the content hash matches the prior snapshot
-- `changed` when the source content hash differs from the prior snapshot
+- `fetch`: request URL, final URL, content type, fetch timestamp, and HTTP status
+- `change`: hash-level snapshot change status plus the previous snapshot pointer
+- `parsing`: parser status, parser id, parsed deadline summary, and milestone-aware diff metadata where parser coverage exists
+- `ingest`: ingest status, imported deadline count, and an explicit queue payload for parser or missing-snapshot failures
+
+The public UI derives trust badges, parser labels, and the `/health/` failure
+queue from this envelope instead of treating missing deadlines as silent gaps.
 
 ## Known gaps
 
-- ACL and EMNLP still need targeted official dates sources or venue-specific parsers.
-- The current diff signal is hash-based; it does not yet classify which milestones changed.
+- Monitoring-only sources still need dedicated parser coverage before they can produce milestone-level diffs.
 - Manual overrides are still the fallback for venue-specific exceptions the shared parser cannot infer safely.
+
+## Wave 2 temporary handling
+
+- CoRL 2026 is tracked through the official homepage and author-instructions page, but it remains monitoring-only until the conference publishes a cleaner machine-parseable dates source.
+- SIGIR 2026 is tracked through the SIGIR organization homepage for now because the year-specific conference site or CFP page is not yet stable enough to treat as a canonical parser source.
+
+## Wave 1 source authority notes
+
+- NAACL coverage uses the latest stable official main-conference source available on March 30, 2026: the NAACL 2025 papers call page with ARR commitment dates.
+- ICCV coverage uses the latest stable official main-conference source available on March 30, 2026: the ICCV 2025 CVF dates page.
 
 Next parser targets:
 
-- ACL official dates or CFP page
-- EMNLP official dates page
-- Venue-specific parsers for sites that do not use the shared conference template
+- Venue-specific parsers for monitoring-only official sources such as CoRL and SIGIR once their canonical date pages settle

@@ -123,7 +123,9 @@ body {
 .source-note,
 .deadline-meta,
 .deadline-note,
-.empty-state {
+.empty-state,
+.trust-copy,
+.warning-copy {
   color: var(--muted);
 }
 
@@ -133,6 +135,19 @@ body {
 .panel-heading a {
   color: var(--accent);
   text-decoration: none;
+}
+
+.list-main {
+  display: grid;
+  gap: 8px;
+}
+
+.provenance-stack {
+  display: grid;
+  gap: 4px;
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.45;
 }
 
 .list-side {
@@ -152,6 +167,49 @@ body {
   gap: 16px;
 }
 
+.badge-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.tone-positive {
+  background: rgba(48, 111, 89, 0.14);
+  color: #245645;
+}
+
+.tone-attention {
+  background: rgba(201, 91, 61, 0.15);
+  color: #9b3f29;
+}
+
+.tone-warning {
+  background: rgba(182, 139, 52, 0.16);
+  color: #7b5a12;
+}
+
+.tone-critical {
+  background: rgba(150, 45, 45, 0.16);
+  color: #8f2323;
+}
+
+.tone-info,
+.tone-neutral {
+  background: rgba(26, 31, 29, 0.08);
+  color: #4e5754;
+}
+
 .deadline-card {
   display: grid;
   gap: 10px;
@@ -169,7 +227,9 @@ body {
 
 .deadline-meta,
 .deadline-note,
-.source-note {
+.source-note,
+.trust-copy,
+.warning-copy {
   margin: 0;
   line-height: 1.5;
 }
@@ -190,6 +250,15 @@ body {
   gap: 6px;
   justify-items: end;
   text-align: right;
+}
+
+.empty-state-stack {
+  display: grid;
+  gap: 12px;
+}
+
+.warning-copy {
+  color: #8f2323;
 }
 
 @media (max-width: 800px) {

@@ -161,8 +161,8 @@
         {
           "key": "official-homepage",
           "kind": "official",
-          "url": "https://aclweb.org/",
-          "notes": "Primary source for conference and anthology links."
+          "url": "https://2026.aclweb.org/",
+          "notes": "Primary canonical source for ACL 2026 calls and homepage Important Dates."
         },
         {
           "key": "openreview",
@@ -202,6 +202,252 @@
           "kind": "community",
           "url": "https://openreview.net/group?id=EMNLP",
           "notes": "Secondary source for review process and submission schedule."
+        }
+      ]
+    },
+    {
+      "slug": "aistats",
+      "name": "AISTATS",
+      "series": "International Conference on Artificial Intelligence and Statistics",
+      "area": "ml",
+      "timezone": "America/New_York",
+      "tracks": [
+        {
+          "slug": "main",
+          "name": "Main Conference",
+          "area": "ml"
+        }
+      ],
+      "sources": [
+        {
+          "key": "official-homepage",
+          "kind": "official",
+          "url": "https://virtual.aistats.org/Conferences/2026",
+          "notes": "Primary official landing page for AISTATS 2026."
+        },
+        {
+          "key": "official-dates",
+          "kind": "official",
+          "url": "https://virtual.aistats.org/Conferences/2026/Dates",
+          "notes": "Structured official dates page for AISTATS 2026 submission milestones."
+        }
+      ]
+    },
+    {
+      "slug": "corl",
+      "name": "CoRL",
+      "series": "Conference on Robot Learning",
+      "area": "robotics",
+      "timezone": "America/Chicago",
+      "tracks": [
+        {
+          "slug": "main",
+          "name": "Main Conference",
+          "area": "robotics"
+        }
+      ],
+      "sources": [
+        {
+          "key": "official-homepage",
+          "kind": "official",
+          "url": "https://2026.corl.org/",
+          "notes": "Primary official landing page for CoRL 2026."
+        },
+        {
+          "key": "official-authors",
+          "kind": "official",
+          "url": "https://2026.corl.org/contributions/instruction-for-authors",
+          "notes": "Official author instructions page with the currently published CoRL 2026 key-date notes; tracked for monitoring until a cleaner dates page is available."
+        }
+      ]
+    },
+    {
+      "slug": "kdd",
+      "name": "KDD",
+      "series": "ACM SIGKDD Conference on Knowledge Discovery and Data Mining",
+      "area": "general",
+      "timezone": "America/Los_Angeles",
+      "tracks": [
+        {
+          "slug": "main",
+          "name": "Research Track",
+          "area": "general"
+        }
+      ],
+      "sources": [
+        {
+          "key": "official-homepage",
+          "kind": "official",
+          "url": "https://kdd2026.kdd.org/",
+          "notes": "Primary official landing page for ACM KDD 2026."
+        },
+        {
+          "key": "official-cfp",
+          "kind": "official",
+          "url": "https://kdd2026.kdd.org/research-track-call-for-papers/",
+          "notes": "Official research-track call for papers page with published 2026 deadlines."
+        }
+      ]
+    },
+    {
+      "slug": "sigir",
+      "name": "SIGIR",
+      "series": "International ACM SIGIR Conference on Research and Development in Information Retrieval",
+      "area": "general",
+      "timezone": "Australia/Melbourne",
+      "tracks": [
+        {
+          "slug": "main",
+          "name": "Main Conference",
+          "area": "general"
+        }
+      ],
+      "sources": [
+        {
+          "key": "official-homepage",
+          "kind": "official",
+          "url": "https://sigir.org/",
+          "notes": "SIGIR organization homepage is tracked until the year-specific SIGIR 2026 site or CFP page is publicly stable."
+        }
+      ]
+    },
+    {
+      "slug": "www",
+      "name": "WWW",
+      "series": "The ACM Web Conference",
+      "area": "general",
+      "timezone": "Asia/Dubai",
+      "tracks": [
+        {
+          "slug": "main",
+          "name": "Research Track",
+          "area": "general"
+        }
+      ],
+      "sources": [
+        {
+          "key": "official-homepage",
+          "kind": "official",
+          "url": "https://www2026.thewebconf.org/",
+          "notes": "Primary official landing page for The Web Conference 2026."
+        },
+        {
+          "key": "official-dates",
+          "kind": "official",
+          "url": "https://www2026.thewebconf.org/important-dates.html",
+          "notes": "Official important-dates page for research track submission milestones."
+        }
+      ]
+    },
+    {
+      "slug": "naacl",
+      "name": "NAACL",
+      "series": "North American Chapter of the Association for Computational Linguistics",
+      "area": "nlp",
+      "timezone": "America/New_York",
+      "tracks": [
+        {
+          "slug": "main",
+          "name": "Main Conference",
+          "area": "nlp"
+        }
+      ],
+      "sources": [
+        {
+          "key": "official-homepage",
+          "kind": "official",
+          "url": "https://2025.naacl.org/",
+          "notes": "Latest stable official conference site for the most recent NAACL main-conference cycle available on March 30, 2026."
+        },
+        {
+          "key": "official-cfp",
+          "kind": "official",
+          "url": "https://2025.naacl.org/calls/papers/",
+          "notes": "Official main-conference papers call page with the latest stable NAACL ARR commitment timeline."
+        }
+      ]
+    },
+    {
+      "slug": "colm",
+      "name": "COLM",
+      "series": "Conference on Language Modeling",
+      "area": "nlp",
+      "timezone": "America/Los_Angeles",
+      "tracks": [
+        {
+          "slug": "main",
+          "name": "Main Track",
+          "area": "nlp"
+        }
+      ],
+      "sources": [
+        {
+          "key": "official-homepage",
+          "kind": "official",
+          "url": "https://colmweb.org/",
+          "notes": "Primary official landing page for COLM 2026."
+        },
+        {
+          "key": "official-dates",
+          "kind": "official",
+          "url": "https://colmweb.org/dates.html",
+          "notes": "Official key-dates page for the COLM 2026 main track."
+        }
+      ]
+    },
+    {
+      "slug": "eccv",
+      "name": "ECCV",
+      "series": "European Conference on Computer Vision",
+      "area": "cv",
+      "timezone": "Europe/Stockholm",
+      "tracks": [
+        {
+          "slug": "main",
+          "name": "Main Conference",
+          "area": "cv"
+        }
+      ],
+      "sources": [
+        {
+          "key": "official-homepage",
+          "kind": "official",
+          "url": "https://eccv.ecva.net/Conferences/2026",
+          "notes": "Primary official landing page for ECCV 2026."
+        },
+        {
+          "key": "official-dates",
+          "kind": "official",
+          "url": "https://eccv.ecva.net/Conferences/2026/Dates",
+          "notes": "Official ECCV 2026 dates page for main-conference submission milestones."
+        }
+      ]
+    },
+    {
+      "slug": "iccv",
+      "name": "ICCV",
+      "series": "IEEE/CVF International Conference on Computer Vision",
+      "area": "cv",
+      "timezone": "Pacific/Honolulu",
+      "tracks": [
+        {
+          "slug": "main",
+          "name": "Main Conference",
+          "area": "cv"
+        }
+      ],
+      "sources": [
+        {
+          "key": "official-homepage",
+          "kind": "official",
+          "url": "https://iccv.thecvf.com/Conferences/2025",
+          "notes": "Latest stable official ICCV conference site available on March 30, 2026."
+        },
+        {
+          "key": "official-dates",
+          "kind": "official",
+          "url": "https://iccv.thecvf.com/Conferences/2025/Dates",
+          "notes": "Official ICCV 2025 dates page for the latest published main-conference submission milestones."
         }
       ]
     }
