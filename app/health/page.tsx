@@ -57,8 +57,8 @@ export default async function HealthPage() {
         <h1>Source health overview</h1>
         <p className="lede">
           Checked {dateFormatter.format(health.checkedAt)} across {health.sourceCount} tracked sources. This view splits
-          source issues into blocked, at-risk, and waiting-for-review queues and mirrors the venue coverage board shown
-          on the home page.
+          source issues into blocked, at-risk, waiting-for-review, and waiting-for-approval queues and mirrors the venue
+          coverage board shown on the home page.
         </p>
       </section>
 
@@ -105,7 +105,10 @@ export default async function HealthPage() {
 
       <section className="grid">
         <QueuePanel title="At-risk queue" items={health.queue.atRisk} />
+        <QueuePanel title="Waiting for approval" items={health.queue.waitingApproval} />
+      </section>
 
+      <section className="grid">
         <article className="panel">
           <div className="panel-heading">
             <h2>Venue coverage board</h2>

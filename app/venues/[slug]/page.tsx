@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { WorkflowAnalyticsTracker } from "../../workflow-analytics-tracker";
 import { getVenueDeadlineDetail, getVenueSlugs } from "@/lib/deadlines";
 
 type VenuePageProps = {
@@ -34,6 +35,7 @@ export default async function VenuePage({ params }: VenuePageProps) {
 
   return (
     <main className="page-shell">
+      <WorkflowAnalyticsTracker eventName="venue_history_opened" metadata={{ venueSlug: venue.slug, source: "detail_page" }} />
       <section className="hero">
         <p className="eyebrow">Venue Detail</p>
         <h1>{venue.name}</h1>
@@ -143,6 +145,47 @@ export default async function VenuePage({ params }: VenuePageProps) {
               </li>
             ))}
           </ul>
+        </article>
+      </section>
+
+      <section className="detail-grid">
+        <article className="panel">
+          <div className="panel-heading">
+            <h2>Venue history</h2>
+            <span>{venue.history.length} recent events</span>
+          </div>
+          {venue.history.length > 0 ? (
+            <ul className="source-list">
+              {venue.history.map((event) => (
+                <li key={event.id}>
+                  <div className="list-main">
+                    <div className="badge-row">
+                      <span className={`status-badge tone-${event.summary.tone}`}>{event.summary.label}</span>
+                      <span className="status-badge tone-neutral">{event.sourceAuthority}</span>
+                      <span className="status-badge tone-neutral">{event.milestoneKind}</span>
+                    </div>
+                    <strong>{event.milestoneName}</strong>
+                    <p className="trust-copy">{event.summary.detail}</p>
+                    <div className="provenance-stack">
+                      <span>Source: {event.sourceKey}</span>
+                      <span>
+                        {event.editionLabel ?? "Unknown edition"}
+                        {event.trackName ? ` · ${event.trackName}` : ""}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="source-meta">
+                    <span>{dateFormatter.format(new Date(event.detectedAt))}</span>
+                    <a href={event.sourceUrl} target="_blank" rel="noreferrer">
+                      Open source
+                    </a>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="empty-state">No durable change history is stored for this venue yet.</p>
+          )}
         </article>
       </section>
     </main>

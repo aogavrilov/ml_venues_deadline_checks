@@ -1,5 +1,8 @@
 import Link from "next/link";
-import { getDeadlineIndex, getMonitorHealth } from "@/lib/deadlines";
+import { DeadlineBrowser } from "./deadline-browser";
+import { TrackedLink } from "./tracked-link";
+import { WorkflowAdoption } from "./workflow-adoption";
+import { getDeadlineBrowseData, getMonitorHealth, getRecentDeadlineEvents } from "@/lib/deadlines";
 
 const dateFormatter = new Intl.DateTimeFormat("en-US", {
   dateStyle: "medium",
@@ -8,9 +11,9 @@ const dateFormatter = new Intl.DateTimeFormat("en-US", {
 });
 
 export default async function HomePage() {
-  const { deadlines, venueSummary } = await getDeadlineIndex();
+  const browseData = await getDeadlineBrowseData();
   const health = await getMonitorHealth();
-  const spotlightDeadlines = deadlines.slice(0, 6);
+  const recentEvents = await getRecentDeadlineEvents(40);
 
   return (
     <main className="page-shell">
@@ -19,53 +22,13 @@ export default async function HomePage() {
         <h1>Official-source deadline ingestion with provenance-backed public views.</h1>
         <p className="lede">
           The current ingestion slice fetches official conference dates pages, normalizes canonical deadlines into the
-          database, and exposes them with source verification metadata, milestone-aware change signals, and explicit
-          failure queueing.
+          database, and now exposes a faceted discovery workspace so a researcher can narrow a large venue set quickly
+          without exporting data or scanning the full list manually.
         </p>
       </section>
 
       <section className="grid">
-        <article className="panel">
-          <div className="panel-heading">
-            <h2>Public deadline index</h2>
-            <span>{deadlines.length} imported milestones</span>
-          </div>
-          <ul className="venue-list">
-            {spotlightDeadlines.map((deadline) => (
-              <li key={deadline.id}>
-                <div className="list-main">
-                  <div className="badge-row">
-                    <span className={`status-badge tone-${deadline.trust.tone}`}>{deadline.trust.label}</span>
-                    {deadline.change ? (
-                      <span className={`status-badge tone-${deadline.change.tone}`}>{deadline.change.label}</span>
-                    ) : null}
-                    <span className={`status-badge tone-${deadline.parser.tone}`}>{deadline.parser.label}</span>
-                    <span className="status-badge tone-neutral">{deadline.sourceTypeLabel}</span>
-                  </div>
-                  <strong>{deadline.name}</strong>
-                  <span>
-                    {deadline.venueName} - {deadline.editionLabel}
-                  </span>
-                  <div className="provenance-stack">
-                    <span>Source snapshot: {deadline.sourceLabel ?? "Manual entry"}</span>
-                    <span>Parser: {deadline.parser.parserName ?? deadline.parser.label}</span>
-                  </div>
-                </div>
-                <div className="list-side">
-                  <strong>{dateFormatter.format(deadline.dueAt)}</strong>
-                  <span>
-                    {deadline.lastVerifiedAt
-                      ? `Verified ${dateFormatter.format(deadline.lastVerifiedAt)}`
-                      : "Verification pending"}
-                  </span>
-                  <span>{deadline.trust.detail}</span>
-                  <span>{deadline.parser.detail}</span>
-                  <Link href={`/venues/${deadline.venueSlug}`}>Open venue</Link>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </article>
+        <DeadlineBrowser data={browseData} recentEvents={recentEvents} />
 
         <article className="panel">
           <div className="panel-heading">
@@ -98,6 +61,15 @@ export default async function HomePage() {
           </ul>
         </article>
       </section>
+
+      <WorkflowAdoption
+        rollout={{
+          blocked: health.queue.blocked.length,
+          atRisk: health.queue.atRisk.length,
+          waitingReview: health.queue.waitingReview.length,
+          waitingApproval: health.queue.waitingApproval.length
+        }}
+      />
 
       <section className="grid">
         <article className="panel">
@@ -159,9 +131,83 @@ export default async function HomePage() {
             <p className="empty-state">No changed milestones or parser-coverage reviews are waiting.</p>
           )}
         </article>
+
+        <article className="panel">
+          <div className="panel-heading">
+            <h2>Waiting for approval</h2>
+            <span>{health.queue.waitingApproval.length} items</span>
+          </div>
+          {health.queue.waitingApproval.length > 0 ? (
+            <ul className="source-list">
+              {health.queue.waitingApproval.map((item) => (
+                <li key={`approval:${item.venueSlug}:${item.sourceKey}:${item.issueType}`}>
+                  <div className="list-main">
+                    <div className="badge-row">
+                      <span className={`status-badge tone-${item.tone}`}>{item.actionLabel}</span>
+                    </div>
+                    <strong>
+                      {item.venueName} - {item.sourceKey}
+                    </strong>
+                    <p className="trust-copy">{item.detail}</p>
+                  </div>
+                  <div className="source-meta">
+                    <span>{item.lastVerifiedAt ? dateFormatter.format(item.lastVerifiedAt) : "Manual entry"}</span>
+                    <Link href={`/venues/${item.venueSlug}`}>Open venue</Link>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="empty-state">No manual-tracking leftovers are waiting for automation approval.</p>
+          )}
+        </article>
       </section>
 
       <section className="grid">
+        <article className="panel">
+          <div className="panel-heading">
+            <h2>Change feed</h2>
+            <span>{recentEvents.length} recent events</span>
+          </div>
+          {recentEvents.length > 0 ? (
+            <ul className="source-list">
+              {recentEvents.map((event) => (
+                <li key={event.id}>
+                  <div className="list-main">
+                    <div className="badge-row">
+                      <span className={`status-badge tone-${event.summary.tone}`}>{event.summary.label}</span>
+                      <span className="status-badge tone-neutral">{event.sourceAuthority}</span>
+                    </div>
+                    <strong>
+                      {event.venueName} - {event.milestoneName}
+                    </strong>
+                    <p className="trust-copy">{event.summary.detail}</p>
+                    <div className="provenance-stack">
+                      <span>
+                        {event.editionLabel ?? "Unknown edition"}
+                        {event.trackName ? ` · ${event.trackName}` : ""}
+                      </span>
+                      <span>Source: {event.sourceKey}</span>
+                    </div>
+                  </div>
+                  <div className="source-meta">
+                    <span>{dateFormatter.format(new Date(event.detectedAt))}</span>
+                    <TrackedLink
+                      href={`/venues/${event.venueSlug}`}
+                      eventName="change_feed_opened"
+                      eventMetadata={{ venueSlug: event.venueSlug }}
+                    >
+                      Open venue history
+                    </TrackedLink>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="empty-state">No durable change events are stored yet. Run fetch and ingest to seed the feed.</p>
+          )}
+        </article>
+
         <article className="panel">
           <div className="panel-heading">
             <h2>At-risk queue</h2>
@@ -195,7 +241,7 @@ export default async function HomePage() {
         <article className="panel">
           <div className="panel-heading">
             <h2>Coverage summary</h2>
-            <span>{venueSummary.length} venues tracked</span>
+            <span>{browseData.summary.venueCount} venues tracked</span>
           </div>
           <ul className="checklist">
             <li>
@@ -236,6 +282,17 @@ export default async function HomePage() {
             <li>Several tracked supporting sources are still monitoring-only and need venue-specific parser coverage</li>
             <li>Manual ingestion config is still JSON-backed and not editable through the UI yet</li>
             <li>The failure queue is derived from latest snapshots today rather than a dedicated persistent incident table</li>
+          </ul>
+        </article>
+      </section>
+
+      <section className="grid">
+        <article className="panel">
+          <h2>Event contract</h2>
+          <ul className="checklist">
+            <li>Each event stores the change type, milestone identity, before-and-after values, and field-level deltas</li>
+            <li>Events are keyed to the exact source snapshot plus venue, edition, track, and source authority metadata</li>
+            <li>Feeds, venue history views, and alerts can read durable rows instead of reparsing snapshot envelopes</li>
           </ul>
         </article>
       </section>

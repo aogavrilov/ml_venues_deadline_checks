@@ -41,6 +41,7 @@ model Venue {
   tracks      Track[]
   sources     Source[]
   deadlines   Deadline[]
+  events      DeadlineEvent[]
 }
 
 model Edition {
@@ -56,6 +57,7 @@ model Edition {
   updatedAt      DateTime    @updatedAt
   venue          Venue       @relation(fields: [venueId], references: [id], onDelete: Cascade)
   deadlines      Deadline[]
+  events         DeadlineEvent[]
 
   @@unique([venueId, year])
   @@index([year])
@@ -72,6 +74,7 @@ model Track {
   updatedAt DateTime  @updatedAt
   venue     Venue     @relation(fields: [venueId], references: [id], onDelete: Cascade)
   deadlines Deadline[]
+  events    DeadlineEvent[]
 
   @@unique([venueId, slug])
 }
@@ -112,6 +115,7 @@ model Source {
   updatedAt     DateTime         @updatedAt
   venue         Venue            @relation(fields: [venueId], references: [id], onDelete: Cascade)
   snapshots     SourceSnapshot[]
+  events        DeadlineEvent[]
 
   @@unique([venueId, key])
 }
@@ -129,6 +133,37 @@ model SourceSnapshot {
   createdAt     DateTime       @default(now())
   source        Source         @relation(fields: [sourceId], references: [id], onDelete: Cascade)
   deadlines     Deadline[]
+  events        DeadlineEvent[]
 
   @@index([sourceId, fetchedAt])
+}
+
+model DeadlineEvent {
+  id               String         @id @default(cuid())
+  venueId          String
+  editionId        String?
+  trackId          String?
+  sourceId         String
+  sourceSnapshotId String
+  sourceKey        String
+  sourceKind       String
+  sourceUrl        String
+  sourceAuthority  String
+  eventType        String
+  milestoneKind    String
+  milestoneName    String
+  detectedAt       DateTime
+  previousValueJson String?
+  currentValueJson  String?
+  fieldChangesJson  String?
+  createdAt        DateTime       @default(now())
+  venue            Venue          @relation(fields: [venueId], references: [id], onDelete: Cascade)
+  edition          Edition?       @relation(fields: [editionId], references: [id], onDelete: SetNull)
+  track            Track?         @relation(fields: [trackId], references: [id], onDelete: SetNull)
+  source           Source         @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  sourceSnapshot   SourceSnapshot @relation(fields: [sourceSnapshotId], references: [id], onDelete: Cascade)
+
+  @@index([venueId, detectedAt])
+  @@index([sourceSnapshotId, detectedAt])
+  @@index([eventType, detectedAt])
 }

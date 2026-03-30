@@ -117,6 +117,56 @@ app. New fetch and ingest runs write a versioned structure with:
 The public UI derives trust badges, parser labels, and the `/health/` failure
 queue from this envelope instead of treating missing deadlines as silent gaps.
 
+## Change-event contract
+
+Phase 2 adds a durable `DeadlineEvent` history table for downstream feeds,
+timelines, and alerts. Each row is keyed to the exact source snapshot that
+detected the change and stores:
+
+- `eventType`: one of `deadline_added`, `deadline_removed`,
+  `deadline_rescheduled`, `deadline_hardness_changed`, or
+  `deadline_metadata_changed`
+- `milestoneKind` and `milestoneName`: the impacted normalized milestone
+- `previousValueJson` and `currentValueJson`: snapshot-level before/after values
+- `fieldChangesJson`: per-field deltas when the milestone was modified
+- `sourceKey`, `sourceKind`, `sourceUrl`, and `sourceAuthority`: source
+  authority and provenance for alerts or UI copy
+- `venueId`, `editionId`, `trackId`, and `detectedAt`: venue-scoped history
+  coordinates and ordering metadata
+
+The ingest worker preserves milestone-aware diffs in
+`SourceSnapshot.extractedJson.parsing.diff`, projects those diffs into durable
+`DeadlineEvent` rows, and exposes them through app-level read helpers for global
+change feeds and per-venue history views. See
+[`docs/change-event-contract.md`](docs/change-event-contract.md) for the full
+contract.
+
+## Workflow adoption instrumentation
+
+Phase 2 also adds browser-local workflow instrumentation so the team can measure
+whether discovery and saved-watchlist flows are replacing manual spreadsheet or
+calendar tracking without requiring backend infrastructure.
+
+- events are stored in `localStorage` under `workflow-analytics-v1`
+- session-level metrics include search-to-save conversion, repeat returns,
+  watchlist creation, compare-mode launches, venue-history opens, and change-feed
+  drilldowns
+- the home page now shows a workflow adoption dashboard plus an explicit
+  `waiting for approval` queue for manual-override deadlines that still lack a
+  verified source snapshot
+- export interactions now track ICS downloads, machine-readable exports, and
+  copied calendar-feed URLs for the current filtered slice
+
+## Export workflows
+
+Phase 2 now ships client-side export flows inside the discovery workspace:
+
+- current filtered slices can be exported directly as `.ics`, `.json`, or `.csv`
+- calendar-feed URLs are generated from the same scoped slice so saved views can
+  move from discovery to subscription without spreadsheet copy-paste
+- export scope and freshness are shown in the UI before generation so users know
+  what each artifact represents
+
 ## Known gaps
 
 - Monitoring-only sources still need dedicated parser coverage before they can produce milestone-level diffs.

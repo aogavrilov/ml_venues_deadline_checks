@@ -81,6 +81,11 @@ body {
   font-size: 1.25rem;
 }
 
+.panel h3 {
+  margin: 0 0 10px;
+  font-size: 1rem;
+}
+
 .panel-heading {
   display: flex;
   justify-content: space-between;
@@ -160,6 +165,234 @@ body {
 .lower-grid,
 .detail-grid {
   margin-top: 20px;
+}
+
+.analytics-grid {
+  margin: 20px 0;
+}
+
+.browse-panel {
+  grid-column: 1 / -1;
+}
+
+.browse-heading {
+  align-items: flex-start;
+}
+
+.browse-heading .eyebrow {
+  margin-bottom: 10px;
+}
+
+.browse-stats {
+  display: grid;
+  gap: 4px;
+  min-width: 160px;
+  justify-items: end;
+  text-align: right;
+}
+
+.browse-stats strong {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.browse-toolbar,
+.facet-grid,
+.workflow-grid,
+.metric-grid,
+.compare-grid,
+.save-form-grid,
+.saved-view-grid {
+  display: grid;
+  gap: 14px;
+}
+
+.browse-toolbar {
+  grid-template-columns: minmax(0, 2.4fr) minmax(180px, 0.8fr) auto;
+  margin-bottom: 14px;
+}
+
+.facet-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-bottom: 18px;
+}
+
+.workflow-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-bottom: 18px;
+}
+
+.metric-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-bottom: 18px;
+}
+
+.compare-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 14px;
+}
+
+.save-form-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 14px 0;
+}
+
+.workflow-card,
+.metric-card {
+  padding: 18px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid var(--line);
+}
+
+.metric-card {
+  display: grid;
+  gap: 8px;
+}
+
+.metric-card span {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.metric-card strong {
+  font-size: 1.9rem;
+  line-height: 1;
+}
+
+.summary-block,
+.saved-view-card {
+  display: grid;
+  gap: 12px;
+}
+
+.summary-block {
+  margin-bottom: 14px;
+}
+
+.summary-block strong {
+  font-size: 0.9rem;
+}
+
+.saved-view-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.saved-view-card {
+  padding: 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid var(--line);
+}
+
+.card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+}
+
+.field span {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.field input,
+.field select {
+  width: 100%;
+  border: 1px solid rgba(26, 31, 29, 0.14);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.88);
+  color: var(--ink);
+  padding: 12px 14px;
+  font: inherit;
+}
+
+.field input::placeholder {
+  color: rgba(95, 106, 103, 0.8);
+}
+
+.secondary-button,
+.facet-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(26, 31, 29, 0.14);
+  background: rgba(255, 255, 255, 0.7);
+  color: var(--ink);
+  text-decoration: none;
+  font: inherit;
+  cursor: pointer;
+}
+
+.static-pill {
+  cursor: default;
+}
+
+.pill-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.result-summary {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.browse-results {
+  max-height: 960px;
+  overflow: auto;
+  padding-right: 6px;
+}
+
+.compare-table {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.compare-row {
+  display: grid;
+  grid-template-columns: minmax(140px, 0.8fr) repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  align-items: start;
+}
+
+.compare-header {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.compare-cell {
+  display: grid;
+  gap: 8px;
+  min-height: 100%;
+  padding: 14px;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.58);
 }
 
 .deadline-stack {
@@ -274,14 +507,24 @@ body {
   .checklist li,
   .source-list li,
   .deadline-timing,
-  .panel-heading {
+  .panel-heading,
+  .browse-toolbar,
+  .facet-grid,
+  .workflow-grid,
+  .metric-grid,
+  .compare-grid,
+  .save-form-grid,
+  .saved-view-grid,
+  .result-summary,
+  .compare-row {
     grid-template-columns: 1fr;
     display: grid;
     justify-content: stretch;
   }
 
   .list-side,
-  .source-meta {
+  .source-meta,
+  .browse-stats {
     justify-items: start;
     text-align: left;
   }

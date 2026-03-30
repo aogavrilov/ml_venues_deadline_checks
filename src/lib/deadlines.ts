@@ -7,6 +7,12 @@ type SnapshotChangeStatus = "first_snapshot" | "changed" | "unchanged" | null;
 type TrustState = "fresh" | "stale" | "changed" | "parser_failed" | "manual_override" | "missing_source";
 type ParsingStatus = "parsed" | "failed" | "unavailable" | undefined;
 type IngestStatus = "pending" | "succeeded" | "failed" | undefined;
+type DeadlineEventType =
+  | "deadline_added"
+  | "deadline_removed"
+  | "deadline_rescheduled"
+  | "deadline_hardness_changed"
+  | "deadline_metadata_changed";
 
 type DeadlineIndexRow = {
   id: string;
@@ -18,8 +24,11 @@ type DeadlineIndexRow = {
   notes: string | null;
   venueSlug: string;
   venueName: string;
+  venueArea: string;
+  venueTimezone: string;
   editionLabel: string;
   editionYear: number;
+  editionLocationName: string | null;
   trackName: string | null;
   sourceKey: string | null;
   sourceUrl: string | null;
@@ -73,6 +82,66 @@ type SourceRow = {
   extractedJson: string | null;
   errorMessage: string | null;
   lastVerifiedAt: string | null;
+};
+
+type DeadlineEventRow = {
+  id: string;
+  eventType: DeadlineEventType;
+  milestoneKind: string;
+  milestoneName: string;
+  detectedAt: string;
+  previousValueJson: string | null;
+  currentValueJson: string | null;
+  fieldChangesJson: string | null;
+  sourceKey: string;
+  sourceKind: string;
+  sourceUrl: string;
+  sourceAuthority: string;
+  venueSlug: string;
+  venueName: string;
+  editionLabel: string | null;
+  editionYear: number | null;
+  trackName: string | null;
+};
+
+export type DeadlineEventValue = {
+  kind: string;
+  name: string;
+  dueAt: string;
+  isHard: boolean;
+  sourceLabel?: string | null;
+  section?: string | null;
+};
+
+export type DeadlineEventFieldChange = {
+  field: string;
+  previous: string | boolean | null;
+  current: string | boolean | null;
+};
+
+export type DeadlineEventFeedItem = {
+  id: string;
+  eventType: DeadlineEventType;
+  milestoneKind: string;
+  milestoneName: string;
+  detectedAt: string;
+  sourceKey: string;
+  sourceKind: string;
+  sourceUrl: string;
+  sourceAuthority: string;
+  venueSlug: string;
+  venueName: string;
+  editionLabel: string | null;
+  editionYear: number | null;
+  trackName: string | null;
+  previousValue: DeadlineEventValue | null;
+  currentValue: DeadlineEventValue | null;
+  fieldChanges: DeadlineEventFieldChange[];
+  summary: {
+    label: string;
+    tone: "positive" | "critical" | "attention" | "warning" | "neutral";
+    detail: string;
+  };
 };
 
 type SnapshotMetadata = {
@@ -149,7 +218,7 @@ type FailureQueueItem = {
   detail: string;
   lastVerifiedAt: Date | null;
 };
-type QueueName = "blocked" | "at_risk" | "waiting_review";
+type QueueName = "blocked" | "at_risk" | "waiting_review" | "waiting_approval";
 type QueueItem = FailureQueueItem & {
   queue: QueueName;
   tone: "critical" | "warning" | "attention";
@@ -169,6 +238,57 @@ type VenueCoverageItem = {
     label: string;
     tone: "positive" | "warning" | "neutral";
     detail: string;
+  };
+};
+
+export type DeadlineBrowseEntry = {
+  id: string;
+  name: string;
+  kind: string;
+  kindLabel: string;
+  dueAt: string;
+  timezone: string;
+  isHard: boolean;
+  notes: string | null;
+  venueSlug: string;
+  venueName: string;
+  venueArea: string;
+  venueAreaLabel: string;
+  venueTimezone: string;
+  geography: string;
+  geographyLabel: string;
+  editionLabel: string;
+  editionYear: number;
+  editionLocationName: string | null;
+  trackName: string | null;
+  sourceLabel: string | null;
+  sourceUrl: string | null;
+  sourceType: string;
+  sourceTypeLabel: string;
+  status: TrustState;
+  statusLabel: string;
+  statusTone: string;
+  statusDetail: string;
+  parserLabel: string;
+  parserDetail: string;
+  lastVerifiedAt: string | null;
+  month: string;
+  monthLabel: string;
+};
+
+export type DeadlineBrowseDataset = {
+  deadlines: DeadlineBrowseEntry[];
+  facets: {
+    fields: Array<{ value: string; label: string; count: number }>;
+    geographies: Array<{ value: string; label: string; count: number }>;
+    months: Array<{ value: string; label: string; count: number }>;
+    deadlineTypes: Array<{ value: string; label: string; count: number }>;
+    statuses: Array<{ value: string; label: string; count: number }>;
+    sourceTypes: Array<{ value: string; label: string; count: number }>;
+  };
+  summary: {
+    deadlineCount: number;
+    venueCount: number;
   };
 };
 
@@ -203,6 +323,18 @@ function parseSnapshotMetadata(raw: string | null): SnapshotMetadata | null {
 
   try {
     return JSON.parse(raw) as SnapshotMetadata;
+  } catch {
+    return null;
+  }
+}
+
+function parseJsonValue<T>(raw: string | null): T | null {
+  if (!raw) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(raw) as T;
   } catch {
     return null;
   }
@@ -248,6 +380,88 @@ function getSourceTypeLabel(kind: string | null) {
   return `${titleCase(kind)} source`;
 }
 
+function getVenueAreaLabel(area: string) {
+  switch (area) {
+    case "ml":
+      return "ML";
+    case "cv":
+      return "CV";
+    case "nlp":
+      return "NLP";
+    case "robotics":
+      return "Robotics";
+    case "general":
+      return "General AI";
+    default:
+      return titleCase(area);
+  }
+}
+
+function getGeographyLabel(timezone: string, locationName: string | null) {
+  if (locationName) {
+    return locationName;
+  }
+
+  if (timezone.startsWith("America/")) {
+    return "Americas";
+  }
+
+  if (timezone.startsWith("Europe/")) {
+    return "Europe";
+  }
+
+  if (timezone.startsWith("Asia/")) {
+    return "Asia";
+  }
+
+  if (timezone.startsWith("Australia/")) {
+    return "Oceania";
+  }
+
+  if (timezone.startsWith("Pacific/")) {
+    return "Pacific";
+  }
+
+  return timezone.split("/")[0] ? titleCase(timezone.split("/")[0]) : "Global";
+}
+
+function slugifyFacetValue(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+function getMonthLabel(date: Date) {
+  return new Intl.DateTimeFormat("en-US", {
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC"
+  }).format(date);
+}
+
+function buildFacetCounts(entries: DeadlineBrowseEntry[], selectValue: (entry: DeadlineBrowseEntry) => string) {
+  const counts = new Map<string, { value: string; label: string; count: number }>();
+
+  for (const entry of entries) {
+    const value = selectValue(entry);
+    const existing = counts.get(value);
+
+    if (existing) {
+      existing.count += 1;
+      continue;
+    }
+
+    counts.set(value, {
+      value,
+      label: value,
+      count: 1
+    });
+  }
+
+  return [...counts.values()];
+}
+
 function getChangeSummary(changeStatus: SnapshotChangeStatus) {
   switch (changeStatus) {
     case "changed":
@@ -271,6 +485,104 @@ function getChangeSummary(changeStatus: SnapshotChangeStatus) {
     default:
       return null;
   }
+}
+
+function getDeadlineEventSummary(event: {
+  eventType: DeadlineEventType;
+  milestoneName: string;
+  previousValue: {
+    dueAt?: string;
+    isHard?: boolean;
+  } | null;
+  currentValue: {
+    dueAt?: string;
+    isHard?: boolean;
+  } | null;
+  fieldChanges: Array<{
+    field: string;
+    previous: string | boolean | null;
+    current: string | boolean | null;
+  }>;
+}) {
+  switch (event.eventType) {
+    case "deadline_added":
+      return {
+        label: "Added",
+        tone: "positive" as const,
+        detail: `${event.milestoneName} appeared in the tracked source`
+      };
+    case "deadline_removed":
+      return {
+        label: "Removed",
+        tone: "critical" as const,
+        detail: `${event.milestoneName} disappeared from the tracked source`
+      };
+    case "deadline_rescheduled":
+      return {
+        label: "Rescheduled",
+        tone: "attention" as const,
+        detail:
+          event.previousValue?.dueAt && event.currentValue?.dueAt
+            ? `${event.milestoneName} moved from ${event.previousValue.dueAt} to ${event.currentValue.dueAt}`
+            : `${event.milestoneName} changed schedule`
+      };
+    case "deadline_hardness_changed":
+      return {
+        label: "Hardness changed",
+        tone: "warning" as const,
+        detail:
+          event.previousValue?.isHard !== undefined && event.currentValue?.isHard !== undefined
+            ? `${event.milestoneName} changed from ${event.previousValue.isHard ? "hard deadline" : "milestone"} to ${
+                event.currentValue.isHard ? "hard deadline" : "milestone"
+              }`
+            : `${event.milestoneName} changed deadline hardness`
+      };
+    default: {
+      const changedFields = event.fieldChanges.map((entry) => titleCase(entry.field)).join(", ");
+
+      return {
+        label: "Metadata changed",
+        tone: "neutral" as const,
+        detail: changedFields
+          ? `${event.milestoneName} changed ${changedFields.toLowerCase()}`
+          : `${event.milestoneName} changed metadata`
+      };
+    }
+  }
+}
+
+function formatDeadlineEvent(row: DeadlineEventRow) {
+  const previousValue = parseJsonValue<DeadlineEventValue>(row.previousValueJson);
+  const currentValue = parseJsonValue<DeadlineEventValue>(row.currentValueJson);
+  const fieldChanges =
+    parseJsonValue<DeadlineEventFieldChange[]>(row.fieldChangesJson) ?? [];
+
+  return {
+    id: row.id,
+    eventType: row.eventType,
+    milestoneKind: row.milestoneKind,
+    milestoneName: row.milestoneName,
+    detectedAt: new Date(row.detectedAt).toISOString(),
+    sourceKey: row.sourceKey,
+    sourceKind: row.sourceKind,
+    sourceUrl: row.sourceUrl,
+    sourceAuthority: row.sourceAuthority,
+    venueSlug: row.venueSlug,
+    venueName: row.venueName,
+    editionLabel: row.editionLabel,
+    editionYear: row.editionYear,
+    trackName: row.trackName,
+    previousValue,
+    currentValue,
+    fieldChanges,
+    summary: getDeadlineEventSummary({
+      eventType: row.eventType,
+      milestoneName: row.milestoneName,
+      previousValue,
+      currentValue,
+      fieldChanges
+    })
+  };
 }
 
 function getTrustSummary(params: {
@@ -717,8 +1029,11 @@ export async function getDeadlineIndex() {
             "Deadline"."notes" AS "notes",
             "Venue"."slug" AS "venueSlug",
             "Venue"."name" AS "venueName",
+            "Venue"."area" AS "venueArea",
+            "Venue"."timezone" AS "venueTimezone",
             "Edition"."label" AS "editionLabel",
             "Edition"."year" AS "editionYear",
+            "Edition"."locationName" AS "editionLocationName",
             "Track"."name" AS "trackName",
             "Source"."key" AS "sourceKey",
             "Source"."url" AS "sourceUrl",
@@ -773,7 +1088,10 @@ export async function getDeadlineIndex() {
         notes: deadline.notes,
         venueSlug: deadline.venueSlug,
         venueName: deadline.venueName,
+        venueArea: deadline.venueArea,
+        venueTimezone: deadline.venueTimezone,
         editionLabel: deadline.editionLabel,
+        editionLocationName: deadline.editionLocationName,
         trackName: deadline.trackName,
         sourceLabel: deadline.sourceKey,
         sourceUrl: deadline.sourceUrl,
@@ -784,6 +1102,90 @@ export async function getDeadlineIndex() {
   } finally {
     database.close();
   }
+}
+
+export async function getDeadlineBrowseData(): Promise<DeadlineBrowseDataset> {
+  const { deadlines } = await getDeadlineIndex();
+  const entries: DeadlineBrowseEntry[] = deadlines.map((deadline) => {
+    const monthLabel = getMonthLabel(deadline.dueAt);
+    const geographyLabel = getGeographyLabel(deadline.venueTimezone, deadline.editionLocationName);
+
+    return {
+      id: deadline.id,
+      name: deadline.name,
+      kind: deadline.kind,
+      kindLabel: titleCase(deadline.kind),
+      dueAt: deadline.dueAt.toISOString(),
+      timezone: deadline.timezone,
+      isHard: deadline.isHard,
+      notes: deadline.notes,
+      venueSlug: deadline.venueSlug,
+      venueName: deadline.venueName,
+      venueArea: deadline.venueArea,
+      venueAreaLabel: getVenueAreaLabel(deadline.venueArea),
+      venueTimezone: deadline.venueTimezone,
+      geography: slugifyFacetValue(geographyLabel),
+      geographyLabel,
+      editionLabel: deadline.editionLabel,
+      editionYear: deadline.editionYear,
+      editionLocationName: deadline.editionLocationName,
+      trackName: deadline.trackName,
+      sourceLabel: deadline.sourceLabel,
+      sourceUrl: deadline.sourceUrl,
+      sourceType: deadline.sourceTypeLabel,
+      sourceTypeLabel: deadline.sourceTypeLabel,
+      status: deadline.trust.state,
+      statusLabel: deadline.trust.label,
+      statusTone: deadline.trust.tone,
+      statusDetail: deadline.trust.detail,
+      parserLabel: deadline.parser.label,
+      parserDetail: deadline.parser.detail,
+      lastVerifiedAt: deadline.lastVerifiedAt ? deadline.lastVerifiedAt.toISOString() : null,
+      month: `${deadline.dueAt.getUTCFullYear()}-${String(deadline.dueAt.getUTCMonth() + 1).padStart(2, "0")}`,
+      monthLabel
+    };
+  });
+
+  const fields = buildFacetCounts(entries, (entry) => entry.venueArea).map((item) => ({
+    ...item,
+    label: getVenueAreaLabel(item.value)
+  }));
+  const geographies = buildFacetCounts(entries, (entry) => entry.geography).map((item) => ({
+    ...item,
+    label: entries.find((entry) => entry.geography === item.value)?.geographyLabel ?? item.value
+  }));
+  const months = buildFacetCounts(entries, (entry) => entry.month).map((item) => ({
+    ...item,
+    label: entries.find((entry) => entry.month === item.value)?.monthLabel ?? item.value
+  }));
+  const deadlineTypes = buildFacetCounts(entries, (entry) => entry.kind).map((item) => ({
+    ...item,
+    label: titleCase(item.value)
+  }));
+  const statuses = buildFacetCounts(entries, (entry) => entry.status).map((item) => ({
+    ...item,
+    label: entries.find((entry) => entry.status === item.value)?.statusLabel ?? item.value
+  }));
+  const sourceTypes = buildFacetCounts(entries, (entry) => entry.sourceType).map((item) => ({
+    ...item,
+    label: item.value
+  }));
+
+  return {
+    deadlines: entries,
+    facets: {
+      fields,
+      geographies,
+      months,
+      deadlineTypes,
+      statuses,
+      sourceTypes
+    },
+    summary: {
+      deadlineCount: entries.length,
+      venueCount: new Set(entries.map((entry) => entry.venueSlug)).size
+    }
+  };
 }
 
 export async function getVenueDeadlineDetail(slug: string) {
@@ -859,6 +1261,37 @@ export async function getVenueDeadlineDetail(slug: string) {
         `
       )
       .all(slug) as SourceRow[];
+    const historyRows = database
+      .prepare(
+        `
+          SELECT
+            "DeadlineEvent"."id" AS "id",
+            "DeadlineEvent"."eventType" AS "eventType",
+            "DeadlineEvent"."milestoneKind" AS "milestoneKind",
+            "DeadlineEvent"."milestoneName" AS "milestoneName",
+            "DeadlineEvent"."detectedAt" AS "detectedAt",
+            "DeadlineEvent"."previousValueJson" AS "previousValueJson",
+            "DeadlineEvent"."currentValueJson" AS "currentValueJson",
+            "DeadlineEvent"."fieldChangesJson" AS "fieldChangesJson",
+            "DeadlineEvent"."sourceKey" AS "sourceKey",
+            "DeadlineEvent"."sourceKind" AS "sourceKind",
+            "DeadlineEvent"."sourceUrl" AS "sourceUrl",
+            "DeadlineEvent"."sourceAuthority" AS "sourceAuthority",
+            "Venue"."slug" AS "venueSlug",
+            "Venue"."name" AS "venueName",
+            "Edition"."label" AS "editionLabel",
+            "Edition"."year" AS "editionYear",
+            "Track"."name" AS "trackName"
+          FROM "DeadlineEvent"
+          INNER JOIN "Venue" ON "Venue"."id" = "DeadlineEvent"."venueId"
+          LEFT JOIN "Edition" ON "Edition"."id" = "DeadlineEvent"."editionId"
+          LEFT JOIN "Track" ON "Track"."id" = "DeadlineEvent"."trackId"
+          WHERE "Venue"."slug" = ?
+          ORDER BY "DeadlineEvent"."detectedAt" DESC, "DeadlineEvent"."createdAt" DESC
+          LIMIT 12
+        `
+      )
+      .all(slug) as DeadlineEventRow[];
     const firstRow = rows[0];
     const editionsById = new Map<
       string,
@@ -935,6 +1368,7 @@ export async function getVenueDeadlineDetail(slug: string) {
       series: firstRow.venueSeries,
       timezone: firstRow.venueTimezone,
       editions: [...editionsById.values()],
+      history: historyRows.map((row) => formatDeadlineEvent(row)),
       sources: sources.map((source) => {
         const metadata = parseSnapshotMetadata(source.extractedJson);
         const parserConfig =
@@ -963,6 +1397,47 @@ export async function getVenueDeadlineDetail(slug: string) {
         };
       })
     };
+  } finally {
+    database.close();
+  }
+}
+
+export async function getRecentDeadlineEvents(limit = 10) {
+  const database = openDatabase();
+
+  try {
+    const rows = database
+      .prepare(
+        `
+          SELECT
+            "DeadlineEvent"."id" AS "id",
+            "DeadlineEvent"."eventType" AS "eventType",
+            "DeadlineEvent"."milestoneKind" AS "milestoneKind",
+            "DeadlineEvent"."milestoneName" AS "milestoneName",
+            "DeadlineEvent"."detectedAt" AS "detectedAt",
+            "DeadlineEvent"."previousValueJson" AS "previousValueJson",
+            "DeadlineEvent"."currentValueJson" AS "currentValueJson",
+            "DeadlineEvent"."fieldChangesJson" AS "fieldChangesJson",
+            "DeadlineEvent"."sourceKey" AS "sourceKey",
+            "DeadlineEvent"."sourceKind" AS "sourceKind",
+            "DeadlineEvent"."sourceUrl" AS "sourceUrl",
+            "DeadlineEvent"."sourceAuthority" AS "sourceAuthority",
+            "Venue"."slug" AS "venueSlug",
+            "Venue"."name" AS "venueName",
+            "Edition"."label" AS "editionLabel",
+            "Edition"."year" AS "editionYear",
+            "Track"."name" AS "trackName"
+          FROM "DeadlineEvent"
+          INNER JOIN "Venue" ON "Venue"."id" = "DeadlineEvent"."venueId"
+          LEFT JOIN "Edition" ON "Edition"."id" = "DeadlineEvent"."editionId"
+          LEFT JOIN "Track" ON "Track"."id" = "DeadlineEvent"."trackId"
+          ORDER BY "DeadlineEvent"."detectedAt" DESC, "DeadlineEvent"."createdAt" DESC
+          LIMIT ?
+        `
+      )
+      .all(limit) as DeadlineEventRow[];
+
+    return rows.map((row) => formatDeadlineEvent(row));
   } finally {
     database.close();
   }
@@ -1065,14 +1540,15 @@ export async function getMonitorHealth() {
       issueType: "missing_source",
       detail: "Deadline is rendered from a manual override without a linked verified source snapshot",
       lastVerifiedAt: null,
-      queue: "waiting_review",
+      queue: "waiting_approval",
       tone: "warning",
-      actionLabel: "Attach or verify source"
+      actionLabel: "Approve automation handoff"
     }));
     const queues: QueueItem[] = [...queue, ...manualOverrideQueue];
     const blockedQueue = queues.filter((item) => item.queue === "blocked");
     const atRiskQueue = queues.filter((item) => item.queue === "at_risk");
     const waitingReviewQueue = queues.filter((item) => item.queue === "waiting_review");
+    const waitingApprovalQueue = queues.filter((item) => item.queue === "waiting_approval");
 
     const sourcesByState = sourceRows.reduce<Record<TrustState, number>>(
       (accumulator, row) => {
@@ -1141,7 +1617,8 @@ export async function getMonitorHealth() {
       queue: {
         blocked: blockedQueue,
         atRisk: atRiskQueue,
-        waitingReview: waitingReviewQueue
+        waitingReview: waitingReviewQueue,
+        waitingApproval: waitingApprovalQueue
       },
       sourcesByState,
       venues,
